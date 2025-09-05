@@ -22,3 +22,4 @@ dependencyResolutionManagement {
 rootProject.name = "ETFlux"
 include(":app")
 include(":core")
+include(":home")
