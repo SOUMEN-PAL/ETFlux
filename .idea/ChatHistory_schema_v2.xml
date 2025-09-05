@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChatHistoryState">
+    <option name="serializedSessions">
+      <map>
+        <entry key="3d2d6fa8-dd4a-48b1-97c3-09a5c675db66" value="{&quot;id&quot;:&quot;3d2d6fa8-dd4a-48b1-97c3-09a5c675db66&quot;,&quot;name&quot;:&quot;[TextContent(type\u003dtext, text\u003d\n\u003cadditional_data\u003e\nBelow are some potentially helpful/relevant pieces of information for figuring out to respond\n\u003ccurrent_file\u003e\n```kotlin:core/src/main/java/org/soumen/core/api/ApiConfigs.kt, lines\u003dALL(1-6)\npackage org.soumen.core.api\n\nobject ApiConfigs {\n    val apiKey: String\n        get() \u003d BuildCongig\n}\n```\n\u003c/current_file\u003e\n\n\n\u003clinter_errors\u003e\n## Linter Errors\n\nPath: core/src/main/java/org/soumen/core/api/ApiConfigs.kt\nErrors:\n\nLine 5: Unresolved reference \u0027BuildCongig\u0027.\n\u003c/linter_errors\u003e\n\u003c/additional_data\u003e\n\u003cuser_query\u003e\nwhy cant I access BuildConfigs?\n\u003c/user_query\u003e)]&quot;,&quot;timestamp&quot;:1757099011958,&quot;messages&quot;:[{&quot;role&quot;:&quot;user&quot;,&quot;content&quot;:[{&quot;type&quot;:&quot;text&quot;,&quot;text&quot;:&quot;\n\u003cadditional_data\u003e\nBelow are some potentially helpful/relevant pieces of information for figuring out to respond\n\u003ccurrent_file\u003e\n```kotlin:core/src/main/java/org/soumen/core/api/ApiConfigs.kt, lines\u003dALL(1-6)\npackage org.soumen.core.api\n\nobject ApiConfigs {\n    val apiKey: String\n        get() \u003d BuildCongig\n}\n```\n\u003c/current_file\u003e\n\n\n\u003clinter_errors\u003e\n## Linter Errors\n\nPath: core/src/main/java/org/soumen/core/api/ApiConfigs.kt\nErrors:\n\nLine 5: Unresolved reference \u0027BuildCongig\u0027.\n\u003c/linter_errors\u003e\n\u003c/additional_data\u003e\n\u003cuser_query\u003e\nwhy cant I access BuildConfigs?\n\u003c/user_query\u003e&quot;}]},{&quot;role&quot;:&quot;assistant&quot;,&quot;content&quot;:[]}]}" />
+      </map>
+    </option>
+  </component>
+</project>
