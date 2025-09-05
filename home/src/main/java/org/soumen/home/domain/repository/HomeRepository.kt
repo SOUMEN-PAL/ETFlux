@@ -12,39 +12,40 @@ class HomeRepository(
         try {
             val data = apiService.getTopGainersLosers()
             val mappedData = HomeData(
-                lastUpdated = data.lastUpdated,
+                lastUpdated = data.last_updated,
                 metadata = data.metadata,
-                mostActivelyTraded = data.mostActivelyTraded.map {
+                mostActivelyTraded = data.most_actively_traded?.map {
                    Data(
-                       changeAmount = it.changeAmount,
-                       changePercentage = it.changePercentage,
+                       changeAmount = it.change_amount,
+                       changePercentage = it.change_percentage,
                        price = it.price,
                        ticker = it.ticker,
                        volume = it.volume
                    )
                 },
-                topGainers = data.topGainers.map{
+                topGainers = data.top_gainers?.map{
                     Data(
-                        changeAmount = it.changeAmount,
-                        changePercentage = it.changePercentage,
+                        changeAmount = it.change_amount,
+                        changePercentage = it.change_percentage,
                         price = it.price,
                         ticker = it.ticker,
                         volume = it.volume
                     )
                 },
-                topLosers = data.topLosers.map{
+                topLosers = data.top_losers?.map{
                     Data(
-                        changeAmount = it.changeAmount,
-                        changePercentage = it.changePercentage,
+                        changeAmount = it.change_amount,
+                        changePercentage = it.change_percentage,
                         price = it.price,
                         ticker = it.ticker,
                         volume = it.volume
                     )
                 }
             )
-
+            println(data)
             return Result.success(mappedData)
         }catch (e: Exception){
+            println(e.message)
             return Result.failure(e)
         }
     }

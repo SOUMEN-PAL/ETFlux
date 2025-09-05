@@ -5,9 +5,9 @@ import org.soumen.home.data.networking.homeApiDataModels.TopGainer
 import org.soumen.home.data.networking.homeApiDataModels.TopLoser
 
 data class HomeData(
-    val lastUpdated: String,
-    val metadata: String,
-    val mostActivelyTraded: List<Data>,
-    val topGainers: List<Data>,
-    val topLosers: List<Data>
+    val lastUpdated: String?,
+    val metadata: String?,
+    val mostActivelyTraded: List<Data>?,
+    val topGainers: List<Data>?,
+    val topLosers: List<Data>?
 )
