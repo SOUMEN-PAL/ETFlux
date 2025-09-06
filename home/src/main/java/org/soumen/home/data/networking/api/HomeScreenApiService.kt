@@ -446,24 +446,24 @@ class HomeScreenApiService: BaseApiService() {
     """.trimIndent()
 
     suspend fun getTopGainersLosers(): HomeApiResponse {
-//        val data =  client.get {
-//            url {
-//                // endpoint function parameter
-//                parameters.append("function", AlphaVantageApi.TOP_GAINERS_LOSERS)
-//
-//                // the authPlugin already appends API key
-//            }
-//        }
-//
-//
-//        Log.e("HomeScreenApiService", "Response: ${data.bodyAsText()} ${data.status.value}" )
-//
-//        return data.body()
+        val data =  client.get {
+            url {
+                // endpoint function parameter
+                parameters.append("function", AlphaVantageApi.TOP_GAINERS_LOSERS)
 
-        val response = Json { ignoreUnknownKeys = true }.decodeFromString<HomeApiResponse>(jsonResponse)
+                // the authPlugin already appends API key
+            }
+        }
 
-        println("Mock Response: $response") // optional log
-        return response
+
+        Log.e("HomeScreenApiService", "Response: ${data.bodyAsText()} ${data.status.value}" )
+
+        return data.body()
+
+//        val response = Json { ignoreUnknownKeys = true }.decodeFromString<HomeApiResponse>(jsonResponse)
+//
+//        println("Mock Response: $response") // optional log
+//        return response
     }
 
 }

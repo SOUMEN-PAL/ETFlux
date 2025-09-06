@@ -126,7 +126,7 @@ fun HomeScreen(
                     is HomeScreenDataState.Success -> {
                         val data = state.data
                         val gainers = data.topGainers.take(4)
-                        val losers = data.topLosers.take<Data>(4)
+                        val losers = data.topLosers.take(4)
 
 
 

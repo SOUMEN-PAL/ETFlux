@@ -13,7 +13,8 @@ val HomeModule = module {
 
     single {
         HomeRepository(
-            apiService = get<HomeScreenApiService>()
+            apiService = get<HomeScreenApiService>(),
+            gainersLosersEntityDao = get()
         )
     }
 

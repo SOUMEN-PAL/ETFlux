@@ -10,8 +10,12 @@ val coreModule = module {
             get(),
             AppDataBase::class.java,
             "appDatabase"
-        ).build()
+        )
+            .fallbackToDestructiveMigration(true)
+            .build()
     }
 
     single { get<AppDataBase>().imageDao() }
+
+    single { get<AppDataBase>().gainersLosersDao() }
 }

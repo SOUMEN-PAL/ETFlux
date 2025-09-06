@@ -4,9 +4,13 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverter
 import kotlinx.coroutines.InternalCoroutinesApi
+import org.soumen.core.db.dao.GainersLosersEntityDao
 import org.soumen.core.db.dao.ImageEntityDao
+import org.soumen.core.db.entities.GainersEntity
 import org.soumen.core.db.entities.ImageDataEntity
+import org.soumen.core.db.entities.LosersEntity
 
 /**
  * The Room database for this app.
@@ -18,11 +22,13 @@ import org.soumen.core.db.entities.ImageDataEntity
  * The database version is currently 1.
  */
 @Database(
-    entities = [ImageDataEntity::class],
-    version = 1,
+    entities = [ImageDataEntity::class , GainersEntity::class , LosersEntity::class],
+    version = 2
 )
 abstract class AppDataBase : RoomDatabase() {
     abstract fun imageDao() : ImageEntityDao
+
+    abstract fun gainersLosersDao() : GainersLosersEntityDao
 
 
     companion object{
