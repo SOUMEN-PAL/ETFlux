@@ -34,6 +34,7 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -64,7 +65,10 @@ fun HomeScreen(
     homeViewModel: HomeViewModel,
     onBottomBarClick: (String) -> Unit = {},
     currentRoute: String?,
-    onSearchClick : () -> Unit = {}
+    onSearchClick: () -> Unit = {},
+    onItemClick : (String) -> Unit = {_->},
+    onGainersViewAllClick : () -> Unit = {},
+    onLosersViewAllClick : () -> Unit = {}
 
 ) {
     DisposableEffect(Unit) {
@@ -108,7 +112,7 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                when(val state = gainerAndLosersDataState.value){
+                when (val state = gainerAndLosersDataState.value) {
                     is HomeScreenDataState.Error -> {
                         Toast.makeText(
                             LocalContext.current,
@@ -116,6 +120,7 @@ fun HomeScreen(
                             Toast.LENGTH_LONG
                         ).show()
                     }
+
                     HomeScreenDataState.Loading -> {
                         LinearProgressIndicator(
                             modifier = Modifier.fillMaxWidth(),
@@ -123,6 +128,7 @@ fun HomeScreen(
                             trackColor = Resources.Colors.overlayColor
                         )
                     }
+
                     is HomeScreenDataState.Success -> {
                         val data = state.data
                         val gainers = data.topGainers.take(4)
@@ -156,9 +162,9 @@ fun HomeScreen(
                                     Row(
                                         modifier = Modifier
                                             .clickable(
-                                                enabled = gainers?.isNotEmpty() == true,
+                                                enabled = gainers.isNotEmpty(),
                                                 onClick = {
-
+                                                    onGainersViewAllClick()
                                                 },
                                                 indication = null,
                                                 interactionSource = interactionSource
@@ -182,7 +188,7 @@ fun HomeScreen(
                                 }
                             }
 
-                            items(gainers) { item ->
+                            items(gainers, key = { it -> it.ticker }) { item ->
                                 HomeItems(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -193,6 +199,17 @@ fun HomeScreen(
                                             shape = RoundedCornerShape(12.dp)
                                         )
                                         .clip(RoundedCornerShape(12.dp))
+                                        .clickable(
+                                            enabled = true,
+                                            onClick = {
+                                                onItemClick(item.ticker)
+                                            },
+                                            indication = ripple(
+                                                color = Resources.Colors.ascentGreen,
+                                                bounded = true
+                                            ),
+                                            interactionSource = remember { MutableInteractionSource() }
+                                        )
                                         .padding(8.dp),
                                     imageURL = imageDataState.value[item.ticker] ?: "",
                                     data = item
@@ -200,7 +217,7 @@ fun HomeScreen(
                             }
 
 
-                            item(span = { GridItemSpan(2) }){
+                            item(span = { GridItemSpan(2) }) {
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth(),
@@ -219,9 +236,9 @@ fun HomeScreen(
                                     Row(
                                         modifier = Modifier
                                             .clickable(
-                                                enabled = gainers?.isNotEmpty() == true,
+                                                enabled = gainers.isNotEmpty(),
                                                 onClick = {
-
+                                                    onLosersViewAllClick()
                                                 },
                                                 indication = null,
                                                 interactionSource = interactionSource
@@ -246,9 +263,10 @@ fun HomeScreen(
                             }
 
 
-                            items(losers) { item ->
+                            items(losers, key = { it -> it.ticker }) { item ->
                                 HomeItems(
                                     modifier = Modifier
+
                                         .fillMaxWidth()
                                         .aspectRatio(1f) // makes height = width
                                         .border(
@@ -257,6 +275,17 @@ fun HomeScreen(
                                             shape = RoundedCornerShape(12.dp)
                                         )
                                         .clip(RoundedCornerShape(12.dp))
+                                        .clickable(
+                                            enabled = true,
+                                            onClick = {
+                                                onItemClick(item.ticker)
+                                            },
+                                            indication = ripple(
+                                                color = Resources.Colors.ascentGreen,
+                                                bounded = true
+                                            ),
+                                            interactionSource = remember { MutableInteractionSource() }
+                                        )
                                         .padding(8.dp),
                                     imageURL = imageDataState.value[item.ticker] ?: "",
                                     data = item

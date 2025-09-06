@@ -5,11 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.soumen.home.domain.repository.HomeRepository
+import org.soumen.home.presentation.states.GainerDataState
 import org.soumen.home.presentation.states.HomeScreenDataState
 import org.soumen.shared.domain.repository.ImageDataRepository
 
@@ -21,12 +23,19 @@ class HomeViewModel(
     private val _homeScreenDataState = MutableStateFlow<HomeScreenDataState>(HomeScreenDataState.Loading)
     val homeScreenDataState = _homeScreenDataState.asStateFlow()
 
+    private val _gainerListState = MutableStateFlow<GainerDataState>(GainerDataState.Loading)
+    val gainerListState = _gainerListState.asStateFlow()
+
+    private val _loserListState = MutableStateFlow<GainerDataState>(GainerDataState.Loading)
+    val loserListState = _loserListState.asStateFlow()
+
     private val _tickerImages = MutableStateFlow<Map<String, String>>(emptyMap())
     val tickerImages = _tickerImages.asStateFlow()
 
     fun getGainersAndLosersData(){
         _homeScreenDataState.value = HomeScreenDataState.Loading
         viewModelScope.launch {
+            delay(100L)
             val result = withContext(Dispatchers.IO + CoroutineName("HomeScreenCall")){
                 repository.getTopGainersAdnLosers()
             }
@@ -46,6 +55,46 @@ class HomeViewModel(
             }
         }
     }
+
+    fun getAllGainers(){
+        _gainerListState.value = GainerDataState.Loading
+        viewModelScope.launch {
+            delay(100L)
+            val data = withContext(Dispatchers.IO + CoroutineName("GainerListCall")) {
+               repository.getGainers()
+            }
+
+            data.onSuccess {
+                _gainerListState.value = GainerDataState.Success(it)
+            }
+
+            data.onFailure {
+                _gainerListState.value = GainerDataState.Error(it.message ?: "Unknown Error")
+            }
+        }
+    }
+
+
+    fun getAllLosers(){
+        _loserListState.value = GainerDataState.Loading
+        viewModelScope.launch {
+            delay(100L)
+            val data = withContext(Dispatchers.IO + CoroutineName("GainerListCall")) {
+                repository.getLosers()
+            }
+
+            data.onSuccess {
+                _loserListState.value = GainerDataState.Success(it)
+            }
+
+            data.onFailure {
+                _loserListState.value = GainerDataState.Error(it.message ?: "Unknown Error")
+            }
+        }
+    }
+
+
+
 
 
     fun getTickerImage(ticker: String) {

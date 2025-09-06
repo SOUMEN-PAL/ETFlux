@@ -105,5 +105,51 @@ class HomeRepository(
         }
     }
 
+    suspend fun getGainers(): Result<List<Data>> {
+        return try{
+            val gainers =
+                gainersLosersEntityDao.getAllGainers()
+
+
+            val data = gainers.map { it->
+                Data(
+                    changeAmount = it.changeAmount,
+                    changePercentage = it.changePercentage,
+                    price = it.price,
+                    ticker = it.ticker,
+                    volume = it.volume
+                )
+            }
+
+            Result.success(data)
+
+        }catch (e : Exception){
+            Result.failure(exception = e)
+        }
+    }
+
+    suspend fun getLosers(): Result<List<Data>> {
+        return try{
+            val losers =
+                gainersLosersEntityDao.getAllLosers()
+
+
+            val data = losers.map { it->
+                Data(
+                    changeAmount = it.changeAmount,
+                    changePercentage = it.changePercentage,
+                    price = it.price,
+                    ticker = it.ticker,
+                    volume = it.volume
+                )
+            }
+
+            Result.success(data)
+
+        }catch (e : Exception){
+            Result.failure(exception = e)
+        }
+    }
+
 }
 
