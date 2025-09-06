@@ -44,6 +44,7 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":shared"))
 
+    implementation(libs.vico.compose.m3)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.compose.animation)

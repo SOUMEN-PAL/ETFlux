@@ -118,6 +118,7 @@ dependencies {
 
     api(libs.coil.compose)
     api(libs.coil.network.okhttp)
+    api(libs.vico.compose.m3)
 }
 
 room {

@@ -164,7 +164,10 @@ fun Navigation(
             TickerInfoScreen(
                 modifier = Modifier,
                 viewModel = homeViewModel,
-                ticker = it.toRoute<TickerInfoRoute>().ticker
+                ticker = it.toRoute<TickerInfoRoute>().ticker,
+                onBackClick = {
+                    navController.popBackStack()
+                }
             )
 
         }

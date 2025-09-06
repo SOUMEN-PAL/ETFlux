@@ -1,11 +1,11 @@
 package org.soumen.home.presentation.screens
 
-import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.outlined.Bookmark
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -44,6 +43,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
+import org.soumen.home.presentation.AmountTab
 import org.soumen.home.presentation.states.TickerDataState
 import org.soumen.home.presentation.states.TickerMonthlyDataState
 import org.soumen.home.presentation.viewmodels.HomeViewModel
@@ -53,8 +55,9 @@ import org.soumen.shared.domain.Resources
 @Composable
 fun TickerInfoScreen(
     modifier: Modifier = Modifier,
-    ticker : String,
+    ticker: String,
     viewModel: HomeViewModel,
+    onBackClick: () -> Unit = {}
 ) {
 
     val tickerDataState = viewModel.tickerDataState.collectAsState()
@@ -64,33 +67,49 @@ fun TickerInfoScreen(
     var limit by rememberSaveable {
         mutableIntStateOf(6)
     }
+    val choice6 = rememberSaveable {
+        mutableStateOf(true)
+    }
+    val choice12 = rememberSaveable {
+        mutableStateOf(false)
+    }
+    val choice36 = rememberSaveable {
+        mutableStateOf(false)
+    }
+
     DisposableEffect(Unit) {
         viewModel.getTickerInfo(ticker)
         viewModel.getTickerImage(ticker)
 
-        onDispose {  }
+        onDispose { }
     }
 
+    BackHandler(true) {
+        onBackClick()
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            Row(modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .statusBarsPadding()
-                .fillMaxWidth(),
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .statusBarsPadding()
+                    .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
-            ){
+            ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ){
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
                     IconButton(
                         onClick = {
-
+                            onBackClick()
                         }
                     ) {
                         Icon(
+                            modifier = Modifier.size(28.dp),
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = "BAck",
                             tint = Resources.Colors.textColor
@@ -139,109 +158,225 @@ fun TickerInfoScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                AnimatedContent(targetState = tickerDataState.value) {state->
-                    when(state){
-                        is TickerDataState.Error -> {
+                AnimatedContent(targetState = tickerDataState.value) { state ->
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
 
-                        }
-                        TickerDataState.Loading -> {
-                            LinearProgressIndicator(
-                                modifier = Modifier.fillMaxWidth(),
-                                color = Resources.Colors.ascentGreen,
-                                trackColor = Resources.Colors.overlayColor
-                            )
-                        }
-                        is TickerDataState.Success -> {
-                            LaunchedEffect(hasLoadedMonthly.value) {
-                                if(!hasLoadedMonthly.value){
-                                    hasLoadedMonthly.value = true
-                                    viewModel.getMonthlyData(ticker , limit)
-                                }
+
+                        when (state) {
+                            is TickerDataState.Error -> {
+
                             }
-                            val data = state.data
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
 
-                                val image = tickerImage.value[ticker]
-
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center
-                                ){
-                                    AsyncImage(
-                                        modifier = Modifier.size(60.dp),
-                                        model = image,
-                                        contentDescription = "Image",
-                                        contentScale = ContentScale.FillBounds
-                                    )
-                                    Spacer(
-                                        modifier = Modifier.width(8.dp)
-                                    )
-                                    Column(
-                                        verticalArrangement = Arrangement.Center,
-                                        horizontalAlignment = Alignment.Start,
-                                    ) {
-                                        Text(
-                                            text = data.Name,
-                                            fontFamily = Resources.AppFont.dmSans,
-                                            fontSize = 16.sp,
-                                            color = Resources.Colors.textColor,
-                                            fontWeight = FontWeight.SemiBold
-                                        )
-
-                                        Text(
-                                            text = data.Exchange,
-                                            fontFamily = Resources.AppFont.dmSans,
-                                            fontSize = 16.sp,
-                                            color = Resources.Colors.ascentGreen,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                    }
-                                }
-
-                                Text(
-                                    text = data.Currency,
-                                    fontFamily = Resources.AppFont.dmSans,
-                                    fontSize = 20.sp,
-                                    color = Resources.Colors.textColor,
-                                    fontWeight = FontWeight.SemiBold
+                            TickerDataState.Loading -> {
+                                LinearProgressIndicator(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    color = Resources.Colors.ascentGreen,
+                                    trackColor = Resources.Colors.overlayColor
                                 )
                             }
 
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                verticalArrangement = Arrangement.Top,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                AnimatedContent(tickerMonthlyDataState.value) {state->
-                                    when(state){
-                                        is TickerMonthlyDataState.Error -> {
-                                            Toast.makeText(
-                                                LocalContext.current,
-                                                state.e,
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        }
-                                        TickerMonthlyDataState.Loading -> {
-                                            LinearProgressIndicator(
-                                                modifier = Modifier.fillMaxWidth(),
+                            is TickerDataState.Success -> {
+                                LaunchedEffect(limit) {
+                                    hasLoadedMonthly.value = true
+                                    viewModel.getMonthlyData(ticker, limit)
+                                }
+                                val data = state.data
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+
+                                    val image = tickerImage.value[ticker]
+
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        AsyncImage(
+                                            modifier = Modifier.size(60.dp),
+                                            model = image,
+                                            contentDescription = "Image",
+                                            contentScale = ContentScale.FillBounds
+                                        )
+                                        Spacer(
+                                            modifier = Modifier.width(8.dp)
+                                        )
+                                        Column(
+                                            verticalArrangement = Arrangement.Center,
+                                            horizontalAlignment = Alignment.Start,
+                                        ) {
+                                            Text(
+                                                text = data.Name,
+                                                fontFamily = Resources.AppFont.dmSans,
+                                                fontSize = 16.sp,
+                                                color = Resources.Colors.textColor,
+                                                fontWeight = FontWeight.SemiBold
+                                            )
+
+                                            Text(
+                                                text = data.Exchange,
+                                                fontFamily = Resources.AppFont.dmSans,
+                                                fontSize = 16.sp,
                                                 color = Resources.Colors.ascentGreen,
-                                                trackColor = Resources.Colors.overlayColor
+                                                fontWeight = FontWeight.Medium
                                             )
                                         }
-                                        is TickerMonthlyDataState.Success -> {
-                                            val monthLyData = state.data
+                                    }
+
+                                    Text(
+                                        text = data.Currency,
+                                        fontFamily = Resources.AppFont.dmSans,
+                                        fontSize = 20.sp,
+                                        color = Resources.Colors.textColor,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                }
 
 
+                                AnimatedContent(tickerMonthlyDataState.value) { state ->
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth(),
+                                        verticalArrangement = Arrangement.Top,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        when (state) {
+                                            is TickerMonthlyDataState.Error -> {
+                                                Toast.makeText(
+                                                    LocalContext.current,
+                                                    state.e,
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
 
+                                            TickerMonthlyDataState.Loading -> {
+                                                LinearProgressIndicator(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    color = Resources.Colors.ascentGreen,
+                                                    trackColor = Resources.Colors.overlayColor
+                                                )
+                                            }
 
+                                            is TickerMonthlyDataState.Success -> {
+                                                val monthLyData = state.data
+                                                // or parse date -> month number
+                                                val highs = monthLyData.map { it.high }
+                                                val lows = monthLyData.map { it.low }
+
+                                                val modelProducer =
+                                                    remember { CartesianChartModelProducer() }
+
+                                                LaunchedEffect(monthLyData) {
+                                                    modelProducer.runTransaction {
+                                                        lineSeries {
+                                                            // First line
+                                                            series(highs)
+
+                                                            // Second line
+                                                            series(lows)
+                                                        }
+                                                    }
+                                                }
+
+                                                CartesianLineChart(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    monthlyData = monthLyData,
+                                                    modelProducer = modelProducer
+                                                )
+                                                HighLowLabel()
+
+                                            }
                                         }
                                     }
                                 }
+
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(
+                                        8.dp,
+                                        Alignment.CenterHorizontally
+                                    ),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+
+                                    AmountTab(
+                                        selected = choice6.value,
+                                        onTap = {
+                                            choice6.value = true
+                                            choice12.value = false
+                                            choice36.value = false
+                                            limit = 6
+                                        },
+                                        amount = "6Month"
+                                    )
+
+                                    AmountTab(
+                                        selected = choice12.value,
+                                        onTap = {
+                                            choice6.value = false
+                                            choice12.value = true
+                                            choice36.value = false
+                                            limit = 12
+                                        },
+                                        amount = "1Year"
+                                    )
+
+                                    AmountTab(
+                                        selected = choice36.value,
+                                        onTap = {
+                                            choice6.value = false
+                                            choice12.value = false
+                                            choice36.value = true
+                                            limit = 36
+
+                                        },
+                                        amount = "3Years"
+                                    )
+                                }
+
+
+                                Text(
+                                    modifier = Modifier.padding(vertical = 16.dp),
+                                    text = data.Description,
+                                    color = Resources.Colors.textColor,
+                                    fontSize = 24.sp,
+                                    fontFamily = Resources.AppFont.dmSans,
+                                    lineHeight = 30.sp,
+                                )
+
+
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                ) {
+                                    Text(
+                                        modifier = Modifier,
+                                        text = data.Exchange,
+                                        fontWeight = FontWeight.Medium,
+                                        color = Resources.Colors.ascentGreen,
+                                        fontSize = 20.sp,
+                                    )
+
+                                    Spacer(
+                                        modifier = Modifier.width(16.dp)
+                                    )
+
+                                    Text(
+                                        modifier = Modifier,
+                                        text = data.AssetType,
+                                        fontWeight = FontWeight.Medium,
+                                        color = Resources.Colors.ascentGreen,
+                                        fontSize = 20.sp,
+                                    )
+
+                                }
+
 
 
                             }
@@ -251,11 +386,63 @@ fun TickerInfoScreen(
                 }
 
 
-
-
-
             }
 
         }
+    }
+}
+
+@Composable
+fun HighLowLabel() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            Box(
+                modifier = Modifier
+                    .size(16.dp)
+                    .background(color = Resources.Colors.ascentGreen)
+            )
+
+            Text(
+                text = "High",
+                color = Resources.Colors.textColor,
+                fontFamily = Resources.AppFont.dmSans,
+                fontWeight = FontWeight.Normal,
+                fontSize = 16.sp
+            )
+
+        }
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            Box(
+                modifier = Modifier
+                    .size(16.dp)
+                    .background(color = Resources.Colors.ascentRed)
+            )
+
+            Text(
+                text = "Low",
+                color = Resources.Colors.textColor,
+                fontFamily = Resources.AppFont.dmSans,
+                fontWeight = FontWeight.Normal,
+                fontSize = 16.sp
+            )
+
+        }
+
+
     }
 }
