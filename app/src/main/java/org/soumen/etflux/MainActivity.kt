@@ -59,7 +59,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier , homeViewModel : HomeV
 
             val d = data.topGainers ?: emptyList()
             LazyColumn {
-                items(d) { item ->
+                items(d.take(4)) { item ->
                     Text(text = item.ticker, modifier = modifier, fontSize = 45.sp)
                 }
             }

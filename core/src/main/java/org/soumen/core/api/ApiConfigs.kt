@@ -9,4 +9,10 @@ object ApiConfigs {
 
     val baseURL : String
         get() = BuildConfig.API_URL
+
+    val imageBaseURL : String
+        get() = BuildConfig.IMAGE_API_URL
+
+    val imageApiKey : String
+        get() = BuildConfig.IMAGE_API_KEY
 }

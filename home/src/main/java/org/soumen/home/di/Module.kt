@@ -19,7 +19,8 @@ val HomeModule = module {
 
     viewModel {
         HomeViewModel(
-            repository = get()
+            repository = get(),
+            imageDataRepository = get()
         )
     }
 }

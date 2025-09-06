@@ -13,6 +13,9 @@ val localProps = gradleLocalProperties(rootDir, providers)
 val apiKey: String = localProps.getProperty("apikey") ?: ""
 val apiURL: String = localProps.getProperty("baseApi") ?: ""
 
+val imageApiURL : String = localProps.getProperty("baseImageApi") ?: ""
+val imageApiKey : String = localProps.getProperty("imageApiKey") ?: ""
+
 android {
     namespace = "org.soumen.core"
     compileSdk = 36
@@ -28,6 +31,8 @@ android {
             isMinifyEnabled = false
             buildConfigField("String", "API_KEY", "\"$apiKey\"")
             buildConfigField("String", "API_URL", "\"$apiURL\"")
+            buildConfigField("String", "IMAGE_API_URL", "\"$imageApiURL\"")
+            buildConfigField("String", "IMAGE_API_KEY", "\"$imageApiKey\"")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -37,6 +42,8 @@ android {
         debug {
             buildConfigField("String", "API_KEY", "\"$apiKey\"")
             buildConfigField("String", "API_URL", "\"$apiURL\"")
+            buildConfigField("String", "IMAGE_API_URL", "\"$imageApiURL\"")
+            buildConfigField("String", "IMAGE_API_KEY", "\"$imageApiKey\"")
         }
     }
     compileOptions {
