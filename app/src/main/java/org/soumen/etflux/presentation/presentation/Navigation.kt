@@ -7,15 +7,18 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import org.soumen.home.presentation.bottomBar.BottomBarItem
 import org.soumen.home.presentation.screens.AllLosersScreen
 import org.soumen.home.presentation.screens.GainerScreen
 import org.soumen.home.presentation.screens.HomeScreen
+import org.soumen.home.presentation.screens.TickerInfoScreen
 import org.soumen.home.presentation.viewmodels.HomeViewModel
 
 
@@ -24,6 +27,9 @@ object AllGainersScreenRoute
 
 @Serializable
 object AllLosersScreenRoute
+
+@Serializable
+data class TickerInfoRoute(val ticker : String)
 
 @Composable
 fun Navigation(
@@ -63,7 +69,7 @@ fun Navigation(
 
                 },
                 onItemClick = {
-
+                    navController.navigate(TickerInfoRoute(it))
                 },
                 onGainersViewAllClick = {
                     navController.navigate(AllGainersScreenRoute)
@@ -92,6 +98,9 @@ fun Navigation(
                     navController.navigate(route) {
 
                     }
+                },
+                onItemClick = {
+                    navController.navigate(TickerInfoRoute(it))
                 }
             )
 
@@ -117,7 +126,7 @@ fun Navigation(
                     navController.popBackStack()
                 },
                 onItemClick = {
-
+                    navController.navigate(TickerInfoRoute(it))
                 }
             )
         }
@@ -143,9 +152,21 @@ fun Navigation(
                     navController.popBackStack()
                 },
                 onItemClick = {
-
+                    navController.navigate(TickerInfoRoute(it))
                 }
             )
+        }
+
+        composable<TickerInfoRoute>(
+            enterTransition = { fadeIn(animationSpec = tween(100)) },
+            exitTransition = { fadeOut(animationSpec = tween(200)) }
+        ) {
+            TickerInfoScreen(
+                modifier = Modifier,
+                viewModel = homeViewModel,
+                ticker = it.toRoute<TickerInfoRoute>().ticker
+            )
+
         }
 
     }

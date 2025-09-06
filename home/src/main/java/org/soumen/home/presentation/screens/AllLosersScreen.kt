@@ -2,6 +2,7 @@ package org.soumen.home.presentation.screens
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -47,13 +48,13 @@ import org.soumen.shared.domain.Resources
 fun AllLosersScreen(
     modifier: Modifier = Modifier,
     homeViewModel: HomeViewModel,
-    onBackClick : () -> Unit = {},
-    onItemClick : (String) -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onItemClick: (String) -> Unit = {}
 ) {
     BackHandler(true) {
         onBackClick()
     }
-    val gainerDataState = homeViewModel.loserListState.collectAsStateWithLifecycle()
+    val loserDataState = homeViewModel.loserListState.collectAsStateWithLifecycle()
     val imageDataState = homeViewModel.tickerImages.collectAsStateWithLifecycle()
 
     DisposableEffect(Unit) {
@@ -69,13 +70,14 @@ fun AllLosersScreen(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            Row(modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .statusBarsPadding()
-                .fillMaxWidth(),
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .statusBarsPadding()
+                    .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
-            ){
+            ) {
                 IconButton(
                     onClick = {
                         onBackClick()
@@ -114,62 +116,65 @@ fun AllLosersScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                when(val state = gainerDataState.value){
-                    is GainerDataState.Error -> {
-                        Toast.makeText(
-                            LocalContext.current,
-                            state.e,
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                    GainerDataState.Loading -> {
-                        LinearProgressIndicator(
-                            modifier = Modifier.fillMaxWidth(),
-                            color = Resources.Colors.ascentGreen,
-                            trackColor = Resources.Colors.overlayColor
-                        )
-                    }
-                    is GainerDataState.Success -> {
-                        LazyVerticalGrid(
-                            state = gridState,
-                            columns = GridCells.Fixed(2),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp), // space between columns
-                            verticalArrangement = Arrangement.spacedBy(12.dp),   // space between rows
-                            contentPadding = PaddingValues(12.dp)               // padding around the grid
-                        ) {
+                AnimatedContent(targetState = loserDataState.value) { state ->
+                    when (state) {
+                        is GainerDataState.Error -> {
+                            Toast.makeText(
+                                LocalContext.current,
+                                state.e,
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
 
-                            items(state.data , key = {it-> it.ticker}){item->
-                                HomeItems(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .aspectRatio(1f) // makes height = width
-                                        .border(
-                                            1.dp,
-                                            Resources.Colors.ascentGreen,
-                                            shape = RoundedCornerShape(12.dp)
-                                        )
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .clickable(
-                                            enabled = true,
-                                            onClick = {
-                                                onItemClick(item.ticker)
-                                            },
-                                            indication = ripple(
-                                                color = Resources.Colors.ascentGreen,
-                                                bounded = true
-                                            ),
-                                            interactionSource = remember { MutableInteractionSource() }
-                                        )
-                                        .padding(8.dp),
-                                    imageURL = imageDataState.value[item.ticker] ?: "",
-                                    data = item
-                                )
+                        GainerDataState.Loading -> {
+                            LinearProgressIndicator(
+                                modifier = Modifier.fillMaxWidth(),
+                                color = Resources.Colors.ascentGreen,
+                                trackColor = Resources.Colors.overlayColor
+                            )
+                        }
+
+                        is GainerDataState.Success -> {
+                            LazyVerticalGrid(
+                                state = gridState,
+                                columns = GridCells.Fixed(2),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp), // space between columns
+                                verticalArrangement = Arrangement.spacedBy(12.dp),   // space between rows
+                                contentPadding = PaddingValues(12.dp)               // padding around the grid
+                            ) {
+
+                                items(state.data, key = { it -> it.ticker }) { item ->
+                                    HomeItems(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .aspectRatio(1f) // makes height = width
+                                            .border(
+                                                1.dp,
+                                                Resources.Colors.ascentGreen,
+                                                shape = RoundedCornerShape(12.dp)
+                                            )
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .clickable(
+                                                enabled = true,
+                                                onClick = {
+                                                    onItemClick(item.ticker)
+                                                },
+                                                indication = ripple(
+                                                    color = Resources.Colors.ascentGreen,
+                                                    bounded = true
+                                                ),
+                                                interactionSource = remember { MutableInteractionSource() }
+                                            )
+                                            .padding(8.dp),
+                                        imageURL = imageDataState.value[item.ticker] ?: "",
+                                        data = item
+                                    )
+                                }
                             }
                         }
                     }
+
                 }
-
-
 
             }
 

@@ -1,6 +1,7 @@
 package org.soumen.home.presentation.screens
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -66,9 +67,9 @@ fun HomeScreen(
     onBottomBarClick: (String) -> Unit = {},
     currentRoute: String?,
     onSearchClick: () -> Unit = {},
-    onItemClick : (String) -> Unit = {_->},
-    onGainersViewAllClick : () -> Unit = {},
-    onLosersViewAllClick : () -> Unit = {}
+    onItemClick: (String) -> Unit = { _ -> },
+    onGainersViewAllClick: () -> Unit = {},
+    onLosersViewAllClick: () -> Unit = {}
 
 ) {
     DisposableEffect(Unit) {
@@ -112,187 +113,189 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                when (val state = gainerAndLosersDataState.value) {
-                    is HomeScreenDataState.Error -> {
-                        Toast.makeText(
-                            LocalContext.current,
-                            state.message,
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-
-                    HomeScreenDataState.Loading -> {
-                        LinearProgressIndicator(
-                            modifier = Modifier.fillMaxWidth(),
-                            color = Resources.Colors.ascentGreen,
-                            trackColor = Resources.Colors.overlayColor
-                        )
-                    }
-
-                    is HomeScreenDataState.Success -> {
-                        val data = state.data
-                        val gainers = data.topGainers.take(4)
-                        val losers = data.topLosers.take(4)
-
-
-
-
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(2),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp), // space between columns
-                            verticalArrangement = Arrangement.spacedBy(12.dp),   // space between rows
-                            contentPadding = PaddingValues(12.dp)               // padding around the grid
-                        ) {
-                            item(span = { GridItemSpan(2) }) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-
-                                    Text(
-                                        text = "Top Gainers",
-                                        color = Resources.Colors.textColor,
-                                        fontFamily = Resources.AppFont.dmSans,
-                                        fontWeight = FontWeight.Normal,
-                                        fontSize = 18.sp
-                                    )
-
-                                    Row(
-                                        modifier = Modifier
-                                            .clickable(
-                                                enabled = gainers.isNotEmpty(),
-                                                onClick = {
-                                                    onGainersViewAllClick()
-                                                },
-                                                indication = null,
-                                                interactionSource = interactionSource
-                                            )
-                                    ) {
-                                        Text(
-                                            text = "View all",
-                                            color = Resources.Colors.textColor,
-                                            fontFamily = Resources.AppFont.dmSans,
-                                            fontWeight = FontWeight.Normal,
-                                            fontSize = 16.sp
-                                        )
-
-                                        Icon(
-                                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                                            contentDescription = "Forward Arrow",
-                                            tint = Resources.Colors.textColor,
-                                        )
-                                    }
-
-                                }
-                            }
-
-                            items(gainers, key = { it -> it.ticker }) { item ->
-                                HomeItems(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .aspectRatio(1f) // makes height = width
-                                        .border(
-                                            1.dp,
-                                            Resources.Colors.ascentGreen,
-                                            shape = RoundedCornerShape(12.dp)
-                                        )
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .clickable(
-                                            enabled = true,
-                                            onClick = {
-                                                onItemClick(item.ticker)
-                                            },
-                                            indication = ripple(
-                                                color = Resources.Colors.ascentGreen,
-                                                bounded = true
-                                            ),
-                                            interactionSource = remember { MutableInteractionSource() }
-                                        )
-                                        .padding(8.dp),
-                                    imageURL = imageDataState.value[item.ticker] ?: "",
-                                    data = item
-                                )
-                            }
-
-
-                            item(span = { GridItemSpan(2) }) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-
-                                    Text(
-                                        text = "Top Losers",
-                                        color = Resources.Colors.textColor,
-                                        fontFamily = Resources.AppFont.dmSans,
-                                        fontWeight = FontWeight.Normal,
-                                        fontSize = 18.sp
-                                    )
-
-                                    Row(
-                                        modifier = Modifier
-                                            .clickable(
-                                                enabled = gainers.isNotEmpty(),
-                                                onClick = {
-                                                    onLosersViewAllClick()
-                                                },
-                                                indication = null,
-                                                interactionSource = interactionSource
-                                            )
-                                    ) {
-                                        Text(
-                                            text = "View all",
-                                            color = Resources.Colors.textColor,
-                                            fontFamily = Resources.AppFont.dmSans,
-                                            fontWeight = FontWeight.Normal,
-                                            fontSize = 16.sp
-                                        )
-
-                                        Icon(
-                                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                                            contentDescription = "Forward Arrow",
-                                            tint = Resources.Colors.textColor,
-                                        )
-                                    }
-
-                                }
-                            }
-
-
-                            items(losers, key = { it -> it.ticker }) { item ->
-                                HomeItems(
-                                    modifier = Modifier
-
-                                        .fillMaxWidth()
-                                        .aspectRatio(1f) // makes height = width
-                                        .border(
-                                            1.dp,
-                                            Resources.Colors.ascentGreen,
-                                            shape = RoundedCornerShape(12.dp)
-                                        )
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .clickable(
-                                            enabled = true,
-                                            onClick = {
-                                                onItemClick(item.ticker)
-                                            },
-                                            indication = ripple(
-                                                color = Resources.Colors.ascentGreen,
-                                                bounded = true
-                                            ),
-                                            interactionSource = remember { MutableInteractionSource() }
-                                        )
-                                        .padding(8.dp),
-                                    imageURL = imageDataState.value[item.ticker] ?: "",
-                                    data = item
-                                )
-                            }
+                AnimatedContent(targetState = gainerAndLosersDataState.value) { state ->
+                    when (state) {
+                        is HomeScreenDataState.Error -> {
+                            Toast.makeText(
+                                LocalContext.current,
+                                state.message,
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
 
+                        HomeScreenDataState.Loading -> {
+                            LinearProgressIndicator(
+                                modifier = Modifier.fillMaxWidth(),
+                                color = Resources.Colors.ascentGreen,
+                                trackColor = Resources.Colors.overlayColor
+                            )
+                        }
+
+                        is HomeScreenDataState.Success -> {
+                            val data = state.data
+                            val gainers = data.topGainers.take(4)
+                            val losers = data.topLosers.take(4)
+
+
+
+
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(2),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp), // space between columns
+                                verticalArrangement = Arrangement.spacedBy(12.dp),   // space between rows
+                                contentPadding = PaddingValues(12.dp)               // padding around the grid
+                            ) {
+                                item(span = { GridItemSpan(2) }) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+
+                                        Text(
+                                            text = "Top Gainers",
+                                            color = Resources.Colors.textColor,
+                                            fontFamily = Resources.AppFont.dmSans,
+                                            fontWeight = FontWeight.Normal,
+                                            fontSize = 18.sp
+                                        )
+
+                                        Row(
+                                            modifier = Modifier
+                                                .clickable(
+                                                    enabled = gainers.isNotEmpty(),
+                                                    onClick = {
+                                                        onGainersViewAllClick()
+                                                    },
+                                                    indication = null,
+                                                    interactionSource = interactionSource
+                                                )
+                                        ) {
+                                            Text(
+                                                text = "View all",
+                                                color = Resources.Colors.textColor,
+                                                fontFamily = Resources.AppFont.dmSans,
+                                                fontWeight = FontWeight.Normal,
+                                                fontSize = 16.sp
+                                            )
+
+                                            Icon(
+                                                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                                contentDescription = "Forward Arrow",
+                                                tint = Resources.Colors.textColor,
+                                            )
+                                        }
+
+                                    }
+                                }
+
+                                items(gainers, key = { it -> it.ticker }) { item ->
+                                    HomeItems(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .aspectRatio(1f) // makes height = width
+                                            .border(
+                                                1.dp,
+                                                Resources.Colors.ascentGreen,
+                                                shape = RoundedCornerShape(12.dp)
+                                            )
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .clickable(
+                                                enabled = true,
+                                                onClick = {
+                                                    onItemClick(item.ticker)
+                                                },
+                                                indication = ripple(
+                                                    color = Resources.Colors.ascentGreen,
+                                                    bounded = true
+                                                ),
+                                                interactionSource = remember { MutableInteractionSource() }
+                                            )
+                                            .padding(8.dp),
+                                        imageURL = imageDataState.value[item.ticker] ?: "",
+                                        data = item
+                                    )
+                                }
+
+
+                                item(span = { GridItemSpan(2) }) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+
+                                        Text(
+                                            text = "Top Losers",
+                                            color = Resources.Colors.textColor,
+                                            fontFamily = Resources.AppFont.dmSans,
+                                            fontWeight = FontWeight.Normal,
+                                            fontSize = 18.sp
+                                        )
+
+                                        Row(
+                                            modifier = Modifier
+                                                .clickable(
+                                                    enabled = gainers.isNotEmpty(),
+                                                    onClick = {
+                                                        onLosersViewAllClick()
+                                                    },
+                                                    indication = null,
+                                                    interactionSource = interactionSource
+                                                )
+                                        ) {
+                                            Text(
+                                                text = "View all",
+                                                color = Resources.Colors.textColor,
+                                                fontFamily = Resources.AppFont.dmSans,
+                                                fontWeight = FontWeight.Normal,
+                                                fontSize = 16.sp
+                                            )
+
+                                            Icon(
+                                                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                                contentDescription = "Forward Arrow",
+                                                tint = Resources.Colors.textColor,
+                                            )
+                                        }
+
+                                    }
+                                }
+
+
+                                items(losers, key = { it -> it.ticker }) { item ->
+                                    HomeItems(
+                                        modifier = Modifier
+
+                                            .fillMaxWidth()
+                                            .aspectRatio(1f) // makes height = width
+                                            .border(
+                                                1.dp,
+                                                Resources.Colors.ascentGreen,
+                                                shape = RoundedCornerShape(12.dp)
+                                            )
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .clickable(
+                                                enabled = true,
+                                                onClick = {
+                                                    onItemClick(item.ticker)
+                                                },
+                                                indication = ripple(
+                                                    color = Resources.Colors.ascentGreen,
+                                                    bounded = true
+                                                ),
+                                                interactionSource = remember { MutableInteractionSource() }
+                                            )
+                                            .padding(8.dp),
+                                        imageURL = imageDataState.value[item.ticker] ?: "",
+                                        data = item
+                                    )
+                                }
+                            }
+
+                        }
                     }
                 }
 

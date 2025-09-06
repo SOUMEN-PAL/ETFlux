@@ -18,4 +18,8 @@ val coreModule = module {
     single { get<AppDataBase>().imageDao() }
 
     single { get<AppDataBase>().gainersLosersDao() }
+
+    single { get<AppDataBase>().tickerInfoDao() }
+
+    single { get<AppDataBase>().monthlyStockEntityDao() }
 }

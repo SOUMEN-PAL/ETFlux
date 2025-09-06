@@ -1,30 +1,41 @@
 package org.soumen.home.domain.repository
 
+import android.util.Log
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.soumen.core.db.dao.GainersLosersEntityDao
+import org.soumen.core.db.dao.MonthlyStockEntityDao
+import org.soumen.core.db.dao.TickerEntityDao
 import org.soumen.core.db.entities.GainersEntity
 import org.soumen.core.db.entities.LosersEntity
+import org.soumen.core.db.entities.MonthlyStockEntity
+import org.soumen.core.db.entities.TickerInfoEntity
 import org.soumen.home.data.networking.api.HomeScreenApiService
 import org.soumen.home.domain.dataModels.Data
 import org.soumen.home.domain.dataModels.HomeData
-
+import org.soumen.home.domain.dataModels.MonthlyTimeSeriesData
+import org.soumen.home.domain.dataModels.TickerData
+import org.soumen.shared.data.network.TickerInfoApiService
+import kotlin.String
 
 
 class HomeRepository(
     private val apiService: HomeScreenApiService,
-    private val gainersLosersEntityDao: GainersLosersEntityDao
+    private val tickerInfoApiService: TickerInfoApiService,
+    private val gainersLosersEntityDao: GainersLosersEntityDao,
+    private val tickerEntityDao: TickerEntityDao,
+    private val monthlyStockEntityDao: MonthlyStockEntityDao
 ) {
 
-    suspend fun getTopGainersAdnLosers(): Result<HomeData>{
+    suspend fun getTopGainersAdnLosers(): Result<HomeData> {
         try {
             val (gainers, losers) = withContext(Dispatchers.IO) {
                 gainersLosersEntityDao.getAllGainers() to gainersLosersEntityDao.getAllLosers()
             }
 
 
-            val response = if(losers.isNotEmpty() && gainers.isNotEmpty()){
+            val response = if (losers.isNotEmpty() && gainers.isNotEmpty()) {
                 HomeData(
                     lastUpdated = "",
                     metadata = "",
@@ -47,9 +58,9 @@ class HomeRepository(
                         )
                     }
                 )
-            }else {
+            } else {
                 val data = apiService.getTopGainersLosers()
-                withContext(Dispatchers.IO + CoroutineName("DB Data addition")){
+                withContext(Dispatchers.IO + CoroutineName("DB Data addition")) {
                     gainersLosersEntityDao.upsertGainers(
                         entities = data.top_gainers?.map {
                             GainersEntity(
@@ -100,18 +111,18 @@ class HomeRepository(
 
             }
             return Result.success(response)
-        }catch (e: Exception){
+        } catch (e: Exception) {
             return Result.failure(e)
         }
     }
 
     suspend fun getGainers(): Result<List<Data>> {
-        return try{
+        return try {
             val gainers =
                 gainersLosersEntityDao.getAllGainers()
 
 
-            val data = gainers.map { it->
+            val data = gainers.map { it ->
                 Data(
                     changeAmount = it.changeAmount,
                     changePercentage = it.changePercentage,
@@ -123,18 +134,18 @@ class HomeRepository(
 
             Result.success(data)
 
-        }catch (e : Exception){
+        } catch (e: Exception) {
             Result.failure(exception = e)
         }
     }
 
     suspend fun getLosers(): Result<List<Data>> {
-        return try{
+        return try {
             val losers =
                 gainersLosersEntityDao.getAllLosers()
 
 
-            val data = losers.map { it->
+            val data = losers.map { it ->
                 Data(
                     changeAmount = it.changeAmount,
                     changePercentage = it.changePercentage,
@@ -146,10 +157,131 @@ class HomeRepository(
 
             Result.success(data)
 
-        }catch (e : Exception){
+        } catch (e: Exception) {
             Result.failure(exception = e)
         }
     }
+
+
+    suspend fun getTickerInfo(ticker: String): Result<TickerData> {
+        return try {
+            val dbData = tickerEntityDao.getTickerData(ticker)
+
+            if (dbData != null) {
+                // Found in DB → return directly
+                val data = TickerData(
+                    AssetType = dbData.AssetType,
+                    CIK = dbData.CIK,
+                    Country = dbData.Country,
+                    Currency = dbData.Currency,
+                    Description = dbData.Description,
+                    Exchange = dbData.Exchange,
+                    Name = dbData.Name,
+                    Symbol = dbData.Symbol
+                )
+                Result.success(data)
+            } else {
+                // Fetch from API
+                val tickerInfo = tickerInfoApiService.getTicketData(ticker)
+
+                val data = TickerData(
+                    AssetType = tickerInfo.AssetType ?: "",
+                    CIK = tickerInfo.CIK ?: "",
+                    Country = tickerInfo.Country ?: "",
+                    Currency = tickerInfo.Currency ?: "",
+                    Description = tickerInfo.Description ?: "",
+                    Exchange = tickerInfo.Exchange ?: "",
+                    Name = tickerInfo.Name ?: "",
+                    Symbol = tickerInfo.Symbol ?: ""
+                )
+
+                // Cache into DB
+                withContext(Dispatchers.IO) {
+                    tickerEntityDao.upsertTickerInfo(
+                        TickerInfoEntity(
+                            AssetType = data.AssetType,
+                            CIK = data.CIK,
+                            Country = data.Country,
+                            Currency = data.Currency,
+                            Description = data.Description,
+                            Exchange = data.Exchange,
+                            Name = data.Name,
+                            Symbol = data.Symbol
+                        )
+                    )
+                }
+
+                Result.success(data)
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+
+    suspend fun getMonthlyData(ticker: String , limit : Int): Result<List<MonthlyTimeSeriesData>> {
+        return try {
+            val dbResponse = monthlyStockEntityDao.getAll(limit = limit , ticker = ticker)
+
+            val successData = if(dbResponse != null && dbResponse.isNotEmpty()){
+                val presentationData = dbResponse.map { data->
+                    MonthlyTimeSeriesData(
+                        symbol = data.symbol,
+                        date = data.date,
+                        open = data.open,
+                        high = data.high,
+                        low = data.low,
+                        close = data.close,
+                        volume = data.volume
+                    )
+                }
+                presentationData
+            }else{
+                val apiResponse = apiService.getTickerMonthlyData(ticker)
+                val symbol = ticker
+//                Log.e("MonthlyDataTag" , "API Response Size: ${apiResponse.monthlyTimeSeries.size}")
+                withContext(Dispatchers.IO + CoroutineName("DB Data addition")) {
+                    monthlyStockEntityDao.upsertAll(
+                        entities = apiResponse.monthlyTimeSeries.map { (data , timeSeriesData)->
+                            MonthlyStockEntity(
+                                symbol = symbol,
+                                date = data,
+                                open = timeSeriesData.open.toDouble(),
+                                high = timeSeriesData.high.toDouble(),
+                                low = timeSeriesData.low.toDouble(),
+                                close = timeSeriesData.close.toDouble(),
+                                volume = timeSeriesData.volume.toLong()
+                            )
+                        }
+                    )
+                }
+
+                val presentationData = apiResponse.monthlyTimeSeries.map { (data , timeSeriesData)->
+                    MonthlyTimeSeriesData(
+                        symbol = symbol,
+                        date = data,
+                        open = timeSeriesData.open.toDouble(),
+                        high = timeSeriesData.high.toDouble(),
+                        low = timeSeriesData.low.toDouble(),
+                        close = timeSeriesData.close.toDouble(),
+                        volume = timeSeriesData.volume.toLong()
+                    )
+                }
+                presentationData
+
+            }
+
+//            Log.e("MonthlyDataTag" , "Data Size: ${successData.size}")
+            Result.success(successData.take(limit))
+
+
+        } catch (e: Exception) {
+            Log.e("MonthlyDataTag" , "Error: ${e.message}")
+            Result.failure(e)
+
+        }
+    }
+
 
 }
 

@@ -10,9 +10,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.soumen.home.domain.dataModels.TickerData
 import org.soumen.home.domain.repository.HomeRepository
 import org.soumen.home.presentation.states.GainerDataState
 import org.soumen.home.presentation.states.HomeScreenDataState
+import org.soumen.home.presentation.states.TickerDataState
+import org.soumen.home.presentation.states.TickerMonthlyDataState
 import org.soumen.shared.domain.repository.ImageDataRepository
 
 class HomeViewModel(
@@ -31,6 +34,12 @@ class HomeViewModel(
 
     private val _tickerImages = MutableStateFlow<Map<String, String>>(emptyMap())
     val tickerImages = _tickerImages.asStateFlow()
+
+    private val _tickerDataState = MutableStateFlow<TickerDataState>(TickerDataState.Loading)
+    val tickerDataState = _tickerDataState.asStateFlow()
+
+    private val _ticketMonthlyData = MutableStateFlow<TickerMonthlyDataState>(TickerMonthlyDataState.Loading)
+    val tickerMonthlyData = _ticketMonthlyData.asStateFlow()
 
     fun getGainersAndLosersData(){
         _homeScreenDataState.value = HomeScreenDataState.Loading
@@ -65,6 +74,11 @@ class HomeViewModel(
             }
 
             data.onSuccess {
+                withContext(Dispatchers.IO){
+                    it.forEach {it->
+                        getTickerImage(it.ticker)
+                    }
+                }
                 _gainerListState.value = GainerDataState.Success(it)
             }
 
@@ -84,6 +98,12 @@ class HomeViewModel(
             }
 
             data.onSuccess {
+                withContext(Dispatchers.IO){
+                    it.forEach {it->
+                        getTickerImage(it.ticker)
+                    }
+                }
+
                 _loserListState.value = GainerDataState.Success(it)
             }
 
@@ -113,4 +133,39 @@ class HomeViewModel(
             }
         }
     }
+
+    fun getTickerInfo(ticker : String){
+        viewModelScope.launch {
+            val result = repository.getTickerInfo(ticker)
+
+            result.onSuccess {
+                _tickerDataState.value = TickerDataState.Success(it)
+            }
+
+            result.onFailure {
+                _tickerDataState.value = TickerDataState.Error(it.message ?: "Unknown Error")
+            }
+        }
+
+    }
+
+    fun getMonthlyData(ticker : String , limit : Int){
+        _ticketMonthlyData.value = TickerMonthlyDataState.Loading
+        viewModelScope.launch {
+            val result = withContext(Dispatchers.IO + CoroutineName("MonthlyDataCall")) {
+                repository.getMonthlyData(ticker, limit)
+            }
+
+            result.onSuccess {
+                _ticketMonthlyData.value = TickerMonthlyDataState.Success(it)
+            }
+
+            result.onFailure {
+                _ticketMonthlyData.value = TickerMonthlyDataState.Error(it.message ?: "Unknown Error")
+            }
+
+        }
+    }
+
+
 }

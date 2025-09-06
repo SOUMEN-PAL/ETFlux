@@ -8,9 +8,13 @@ import androidx.room.TypeConverter
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.soumen.core.db.dao.GainersLosersEntityDao
 import org.soumen.core.db.dao.ImageEntityDao
+import org.soumen.core.db.dao.MonthlyStockEntityDao
+import org.soumen.core.db.dao.TickerEntityDao
 import org.soumen.core.db.entities.GainersEntity
 import org.soumen.core.db.entities.ImageDataEntity
 import org.soumen.core.db.entities.LosersEntity
+import org.soumen.core.db.entities.MonthlyStockEntity
+import org.soumen.core.db.entities.TickerInfoEntity
 
 /**
  * The Room database for this app.
@@ -22,13 +26,17 @@ import org.soumen.core.db.entities.LosersEntity
  * The database version is currently 1.
  */
 @Database(
-    entities = [ImageDataEntity::class , GainersEntity::class , LosersEntity::class],
-    version = 2
+    entities = [ImageDataEntity::class , GainersEntity::class , LosersEntity::class , TickerInfoEntity::class , MonthlyStockEntity::class],
+    version = 4
 )
 abstract class AppDataBase : RoomDatabase() {
     abstract fun imageDao() : ImageEntityDao
 
     abstract fun gainersLosersDao() : GainersLosersEntityDao
+
+    abstract fun tickerInfoDao() : TickerEntityDao
+
+    abstract fun monthlyStockEntityDao() : MonthlyStockEntityDao
 
 
     companion object{

@@ -14,7 +14,10 @@ val HomeModule = module {
     single {
         HomeRepository(
             apiService = get<HomeScreenApiService>(),
-            gainersLosersEntityDao = get()
+            gainersLosersEntityDao = get(),
+            tickerInfoApiService = get(),
+            tickerEntityDao = get(),
+            monthlyStockEntityDao = get()
         )
     }
 

@@ -63,7 +63,7 @@ object AlphaVantageApi {
     // Functions
     const val OVERVIEW = "OVERVIEW"
     const val TIME_SERIES_DAILY = "TIME_SERIES_DAILY_ADJUSTED"
-    const val TIME_SERIES_MONTHLY = "TIME_SERIES_MONTHLY_ADJUSTED"
+    const val TIME_SERIES_MONTHLY = "TIME_SERIES_MONTHLY"
     const val SYMBOL_SEARCH = "SYMBOL_SEARCH"
     const val TOP_GAINERS_LOSERS = "TOP_GAINERS_LOSERS"
 }

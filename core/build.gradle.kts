@@ -110,7 +110,7 @@ dependencies {
     api(libs.bundles.ktor)
 
     api(libs.androidx.navigation.compose)
-
+    api(libs.androidx.material.icons.extended)
 
 
     // WorkManager
