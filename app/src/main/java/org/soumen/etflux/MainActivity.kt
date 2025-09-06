@@ -18,6 +18,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
+import org.soumen.core.utils.CurrentActivityHolder
+import org.soumen.etflux.presentation.presentation.Navigation
 import org.soumen.etflux.ui.theme.ETFluxTheme
 import org.soumen.home.presentation.states.HomeScreenDataState
 import org.soumen.home.presentation.viewmodels.HomeViewModel
@@ -26,16 +28,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        CurrentActivityHolder.activity = this
         setContent {
             val homeViewModel = koinViewModel<HomeViewModel>()
             ETFluxTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding),
-                        homeViewModel = homeViewModel
-                    )
-                }
+                Navigation(homeViewModel = homeViewModel)
             }
         }
     }

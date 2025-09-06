@@ -1,0 +1,55 @@
+package org.soumen.etflux.presentation.presentation
+
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import org.soumen.home.presentation.bottomBar.BottomBarItem
+import org.soumen.home.presentation.screens.HomeScreen
+import org.soumen.home.presentation.viewmodels.HomeViewModel
+
+
+@Composable
+fun Navigation(
+    homeViewModel: HomeViewModel
+){
+
+    val navController = rememberNavController()
+    val bottomBar = listOf(
+        BottomBarItem.Home,
+        BottomBarItem.WatchList
+    )
+
+    NavHost(
+        navController = navController,
+        startDestination = BottomBarItem.Home.route
+    ) {
+
+        composable(
+            route = BottomBarItem.Home.route,
+            enterTransition = { fadeIn(animationSpec = tween(100)) },
+            exitTransition = { fadeOut(animationSpec = tween(200)) }
+        ){
+
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute = navBackStackEntry?.destination?.route
+
+            HomeScreen(
+                bottomBarItems = bottomBar,
+                homeViewModel = homeViewModel,
+                currentRoute = currentRoute,
+                onBottomBarClick = { route ->
+                    navController.navigate(route) {
+
+                    }
+                }
+            )
+        }
+
+    }
+}

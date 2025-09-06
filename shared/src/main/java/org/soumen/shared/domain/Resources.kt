@@ -96,6 +96,7 @@ object Resources {
 
     object Colors{
         val background = Color.White
+        val background2 = Color(0xFFE8E7EA)
         val ascentRed = Color(0xFFE34C3B)
         val ascentGreen = Color(0xFF3ECF9C)
         val textColor = Color(0xFF36383A)

@@ -105,6 +105,8 @@ dependencies {
     api(libs.koin.compose.viewmodel)
     api(libs.bundles.ktor)
 
+    api(libs.androidx.navigation.compose)
+
 
 
     // WorkManager
