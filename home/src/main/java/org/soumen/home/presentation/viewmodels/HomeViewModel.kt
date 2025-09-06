@@ -32,10 +32,10 @@ class HomeViewModel(
             }
 
             result.onSuccess {
-                it.topGainers.forEach { data ->
+                it.topGainers.take(4).forEach { data ->
                     getTickerImage(data.ticker)
                 }
-                it.topLosers.forEach { data ->
+                it.topLosers.take(4).forEach { data ->
                     getTickerImage(data.ticker)
                 }
                 _homeScreenDataState.value = HomeScreenDataState.Success(it)

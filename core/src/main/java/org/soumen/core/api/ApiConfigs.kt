@@ -15,4 +15,7 @@ object ApiConfigs {
 
     val imageApiKey : String
         get() = BuildConfig.IMAGE_API_KEY
+
+    val clearbitApiKey : String
+        get() = BuildConfig.CLEARBIT_API_KEY
 }

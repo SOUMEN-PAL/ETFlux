@@ -16,6 +16,8 @@ val apiURL: String = localProps.getProperty("baseApi") ?: ""
 val imageApiURL : String = localProps.getProperty("baseImageApi") ?: ""
 val imageApiKey : String = localProps.getProperty("imageApiKey") ?: ""
 
+val clearbitApiKey : String = localProps.getProperty("clearbitApiKey") ?: ""
+
 android {
     namespace = "org.soumen.core"
     compileSdk = 36
@@ -33,6 +35,7 @@ android {
             buildConfigField("String", "API_URL", "\"$apiURL\"")
             buildConfigField("String", "IMAGE_API_URL", "\"$imageApiURL\"")
             buildConfigField("String", "IMAGE_API_KEY", "\"$imageApiKey\"")
+            buildConfigField("String", "CLEARBIT_API_KEY", "\"$clearbitApiKey\"")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -44,6 +47,7 @@ android {
             buildConfigField("String", "API_URL", "\"$apiURL\"")
             buildConfigField("String", "IMAGE_API_URL", "\"$imageApiURL\"")
             buildConfigField("String", "IMAGE_API_KEY", "\"$imageApiKey\"")
+            buildConfigField("String", "CLEARBIT_API_KEY", "\"$clearbitApiKey\"")
         }
     }
     compileOptions {
