@@ -1,5 +1,6 @@
 package org.soumen.home.presentation.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineName
@@ -24,12 +25,19 @@ class HomeViewModel(
     val tickerImages = _tickerImages.asStateFlow()
 
     fun getGainersAndLosersData(){
+        _homeScreenDataState.value = HomeScreenDataState.Loading
         viewModelScope.launch {
             val result = withContext(Dispatchers.IO + CoroutineName("HomeScreenCall")){
                 repository.getTopGainersAdnLosers()
             }
 
             result.onSuccess {
+                it.topGainers.forEach { data ->
+                    getTickerImage(data.ticker)
+                }
+                it.topLosers.forEach { data ->
+                    getTickerImage(data.ticker)
+                }
                 _homeScreenDataState.value = HomeScreenDataState.Success(it)
             }
 
@@ -47,9 +55,11 @@ class HomeViewModel(
             }
 
             result.onSuccess { url ->
+                Log.e("ImageTAgSuccess" , "Image URL: ${url}")
                 _tickerImages.value = _tickerImages.value + (ticker to url)
             }
             result.onFailure {
+                Log.e("ImageTAgFailure" , "Image Message: ${it.message}")
 
             }
         }

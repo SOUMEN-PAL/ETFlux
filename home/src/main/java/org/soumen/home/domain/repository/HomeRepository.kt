@@ -4,6 +4,8 @@ import org.soumen.home.data.networking.api.HomeScreenApiService
 import org.soumen.home.domain.dataModels.Data
 import org.soumen.home.domain.dataModels.HomeData
 
+
+
 class HomeRepository(
     private val apiService: HomeScreenApiService
 ) {
@@ -12,8 +14,8 @@ class HomeRepository(
         try {
             val data = apiService.getTopGainersLosers()
             val mappedData = HomeData(
-                lastUpdated = data.last_updated,
-                metadata = data.metadata,
+                lastUpdated = data.last_updated?:"",
+                metadata = data.metadata?:"",
                 mostActivelyTraded = data.most_actively_traded?.map {
                    Data(
                        changeAmount = it.change_amount,
@@ -22,7 +24,7 @@ class HomeRepository(
                        ticker = it.ticker,
                        volume = it.volume
                    )
-                },
+                } ?: emptyList(),
                 topGainers = data.top_gainers?.map{
                     Data(
                         changeAmount = it.change_amount,
@@ -31,7 +33,7 @@ class HomeRepository(
                         ticker = it.ticker,
                         volume = it.volume
                     )
-                },
+                } ?: emptyList(),
                 topLosers = data.top_losers?.map{
                     Data(
                         changeAmount = it.change_amount,
@@ -40,12 +42,10 @@ class HomeRepository(
                         ticker = it.ticker,
                         volume = it.volume
                     )
-                }
+                } ?: emptyList()
             )
-            println(data)
             return Result.success(mappedData)
         }catch (e: Exception){
-            println(e.message)
             return Result.failure(e)
         }
     }

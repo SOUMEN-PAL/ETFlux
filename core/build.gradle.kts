@@ -111,6 +111,9 @@ dependencies {
 
     // WorkManager
     api(libs.androidx.work.runtime.ktx)
+
+    api(libs.coil.compose)
+    api(libs.coil.network.okhttp)
 }
 
 room {

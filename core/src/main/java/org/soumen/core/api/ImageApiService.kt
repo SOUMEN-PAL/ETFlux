@@ -12,9 +12,9 @@ import io.ktor.http.URLProtocol
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-abstract class ImageApiService{
-    protected val client = HttpClient(engine = OkHttp.create()){
-        install(Logging){
+abstract class ImageApiService {
+    protected val client = HttpClient(engine = OkHttp.create()) {
+        install(Logging) {
             level = LogLevel.INFO
         }
         install(ContentNegotiation) {
@@ -29,8 +29,8 @@ abstract class ImageApiService{
             connectTimeoutMillis = 30000
             socketTimeoutMillis = 30000
         }
-        install(DefaultRequest){
-            url{
+        install(DefaultRequest) {
+            url {
                 protocol = URLProtocol.HTTPS
                 host = ApiConfigs.imageBaseURL
             }
@@ -41,16 +41,8 @@ abstract class ImageApiService{
 
 fun imageAuthPlugin() = createClientPlugin(
     name = "imageAuthPlugin"
-){
+) {
     onRequest { request, _ ->
-
-        fun imageAuthPlugin() = createClientPlugin(
-            name = "imageAuthPlugin"
-        ){
-            onRequest { request, _ ->
-                request.headers.append("X-Api-Key", ApiConfigs.imageApiKey)
-            }
-        }
-
+        request.headers.append("X-Api-Key", ApiConfigs.imageApiKey)
     }
 }

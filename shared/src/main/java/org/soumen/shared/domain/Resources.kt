@@ -106,5 +106,8 @@ object Resources {
     object Icons{
         val bookmark = R.drawable.bookmark
         val home = R.drawable.home
+        val appIcon = R.drawable.app_icon
+        val trendingUp = R.drawable.increase
+        val trendingDown = R.drawable.decrease
     }
 }

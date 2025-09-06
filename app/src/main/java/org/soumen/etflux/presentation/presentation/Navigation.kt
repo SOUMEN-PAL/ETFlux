@@ -47,8 +47,34 @@ fun Navigation(
                     navController.navigate(route) {
 
                     }
+                },
+                onSearchClick = {
+
                 }
             )
+        }
+
+
+        composable(
+            route = BottomBarItem.WatchList.route,
+            enterTransition = { fadeIn(animationSpec = tween(100)) },
+            exitTransition = { fadeOut(animationSpec = tween(200)) }
+        ) {
+
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute = navBackStackEntry?.destination?.route
+
+            HomeScreen(
+                bottomBarItems = bottomBar,
+                homeViewModel = homeViewModel,
+                currentRoute = currentRoute,
+                onBottomBarClick = { route ->
+                    navController.navigate(route) {
+
+                    }
+                }
+            )
+
         }
 
     }
