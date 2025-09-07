@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -109,6 +110,7 @@ fun TickerInfoScreen(
     }
 
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     val modalSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -169,9 +171,6 @@ fun TickerInfoScreen(
                         } else {
                             // Not bookmarked → open modal
                             showBookMarkModal = true
-                            scope.launch {
-                                modalSheetState.show()
-                            }
                         }
                     }
                 ) {
@@ -441,10 +440,7 @@ fun TickerInfoScreen(
         ModalBottomSheet(
             sheetState = modalSheetState,
             onDismissRequest = {
-                scope.launch {
-                    modalSheetState.hide()
-                    showBookMarkModal = false
-                }
+                showBookMarkModal = false
             },
             containerColor = Resources.Colors.background
         ) {
@@ -486,6 +482,10 @@ fun TickerInfoScreen(
                     onClick = {
                         if(watchListName.isNotEmpty()) {
                             viewModel.addWatchList(watchListName)
+                            watchListName = ""
+                        }
+                        else{
+                            Toast.makeText(context, "Watchlist name cannot be empty", Toast.LENGTH_SHORT).show()
                         }
                     },
                     shape = RoundedCornerShape(12.dp),
@@ -516,8 +516,8 @@ fun TickerInfoScreen(
             }
 
             var selectedId by rememberSaveable { mutableStateOf<Long?>(null) }
-            val context = LocalContext.current
             LazyColumn(
+                modifier = Modifier.height(300.dp),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -533,9 +533,7 @@ fun TickerInfoScreen(
                         },
                         onSaveClick = { id ->
                             viewModel.saveToBookmark(watchlistID = id , ticker = ticker)
-                            scope.launch {
-                                modalSheetState.hide()
-                            }
+                            showBookMarkModal = false
                             Toast.makeText(context, "Saved to ${item.watchlistName}", Toast.LENGTH_SHORT).show()
                         }
                     )
