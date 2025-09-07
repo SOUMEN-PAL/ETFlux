@@ -1,5 +1,7 @@
 # ETFlux – Combined Documentation
 
+[⬇️ Download APK](https://drive.google.com/file/d/13I2LXTv122OQa4LbgypFBwzbCqNj7nRB/view?usp=sharing)
+
 This file aggregates all Markdown documents in a single place for easy consumption.
 
 Table of Contents
@@ -39,6 +41,38 @@ This README provides a quick overview. Extensive documentation is available in t
 - Requirements: Android Studio Iguana or newer, JDK 17, Android SDK 24+.
 - Clone the repository and open it in Android Studio.
 - Build and run the app on a device or emulator. See docs/BuildAndRun.md for details.
+
+## Screenshots & Demo
+
+Images:
+
+- App Info
+
+  ![App Info](docs/appInfo.jpeg)
+
+- Top Gainers
+
+  ![Top Gainers](docs/topGainers.jpeg)
+
+- Top Losers
+
+  ![Top Losers](docs/topLosers.jpeg)
+
+- Top Gainers vs Losers
+
+  ![Top Gainers vs Losers](docs/topGainersLosers.jpeg)
+
+- Watchlist
+
+  ![Watchlist](docs/watchlist.jpeg)
+
+- Watchlist Items
+
+  ![Watchlist Items](docs/watchlistItems.jpeg)
+
+Video:
+
+- App Demo (MP4): [View in docs/AppDemo.mp4](docs/AppDemo.mp4)
 
 ## High-level Architecture
 

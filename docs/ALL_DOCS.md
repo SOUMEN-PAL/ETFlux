@@ -1,5 +1,7 @@
 # ETFlux – Combined Documentation
 
+[⬇️ Download APK](https://drive.google.com/file/d/13I2LXTv122OQa4LbgypFBwzbCqNj7nRB/view?usp=sharing)
+
 This file aggregates all Markdown documents in a single place for easy consumption.
 
 Table of Contents
