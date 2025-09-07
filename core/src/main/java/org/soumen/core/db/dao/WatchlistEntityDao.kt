@@ -15,4 +15,13 @@ interface WatchlistEntityDao {
     @Query("SELECT * FROM watchlist")
     fun getAllWatchlist() : Flow<List<WatchlistEntity>>
 
+    @Query("SELECT * FROM watchlist")
+    suspend fun getAllWatchlistOnce() : List<WatchlistEntity>
+
+    @Query("""
+        DELETE FROM
+        watchlist
+        WHERE watchlistId = :id
+    """)suspend fun deleteWatchlist(id : Long)
+
 }

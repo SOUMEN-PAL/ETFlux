@@ -1,4 +1,4 @@
-package org.soumen.home.presentation.bottomBar
+package org.soumen.shared.presentation.bottomBar
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi

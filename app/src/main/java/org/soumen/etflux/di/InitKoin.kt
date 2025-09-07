@@ -6,6 +6,7 @@ import org.koin.dsl.module
 import org.soumen.core.di.coreModule
 import org.soumen.home.di.HomeModule
 import org.soumen.shared.di.sharedModule
+import org.soumen.watchlist.di.watchlistModule
 
 fun initKoin(config: KoinAppDeclaration? = null){
     startKoin {
@@ -14,7 +15,8 @@ fun initKoin(config: KoinAppDeclaration? = null){
             mainModule,
             HomeModule,
             sharedModule,
-            coreModule
+            coreModule,
+            watchlistModule
         )
     }
 }

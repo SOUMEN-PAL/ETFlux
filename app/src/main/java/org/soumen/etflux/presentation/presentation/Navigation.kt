@@ -16,12 +16,15 @@ import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.soumen.home.domain.dataModels.Data
-import org.soumen.home.presentation.bottomBar.BottomBarItem
+import org.soumen.shared.presentation.bottomBar.BottomBarItem
 import org.soumen.home.presentation.screens.AllLosersScreen
 import org.soumen.home.presentation.screens.GainerScreen
 import org.soumen.home.presentation.screens.HomeScreen
 import org.soumen.home.presentation.screens.TickerInfoScreen
 import org.soumen.home.presentation.viewmodels.HomeViewModel
+import org.soumen.watchlist.presentation.WatchListItemsScreen
+import org.soumen.watchlist.presentation.WatchlistScreen
+import org.soumen.watchlist.presentation.viewmodel.WatchlistViewModel
 
 
 @Serializable
@@ -33,9 +36,13 @@ object AllLosersScreenRoute
 @Serializable
 data class TickerInfoRoute(val tickerJson: String)
 
+@Serializable
+data class IndividualWatchlistScreenRoute(val watchlistID : Long)
+
 @Composable
 fun Navigation(
-    homeViewModel: HomeViewModel
+    homeViewModel: HomeViewModel,
+    watchListViewModel: WatchlistViewModel
 ){
 
     val navController = rememberNavController()
@@ -93,17 +100,21 @@ fun Navigation(
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
 
-            HomeScreen(
+            WatchlistScreen(
+                watchlistViewModel = watchListViewModel,
+                onBackClick = {
+                    navController.popBackStack()
+                },
                 bottomBarItems = bottomBar,
-                homeViewModel = homeViewModel,
-                currentRoute = currentRoute,
+                modifier = Modifier,
                 onBottomBarClick = { route ->
                     navController.navigate(route) {
 
                     }
                 },
+                currentRoute = currentRoute,
                 onItemClick = {
-//                    navController.navigate(TickerInfoRoute(it))
+                    navController.navigate(IndividualWatchlistScreenRoute(it))
                 }
             )
 
@@ -179,6 +190,30 @@ fun Navigation(
             )
 
         }
+
+
+        composable<IndividualWatchlistScreenRoute>(
+            enterTransition = { fadeIn(animationSpec = tween(100)) },
+            exitTransition = { fadeOut(animationSpec = tween(200)) }
+        ) {
+            val watchlistID = it.toRoute<IndividualWatchlistScreenRoute>().watchlistID
+
+            WatchListItemsScreen(
+                watchListId = watchlistID,
+                watchlistViewModel = watchListViewModel,
+                homeViewModel = homeViewModel,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onItemClick = {
+                    val route = TickerInfoRoute(Json.encodeToString(it))
+                    navController.navigate(route)
+                }
+            )
+
+        }
+
+
 
     }
 }

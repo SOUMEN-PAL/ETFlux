@@ -1,4 +1,4 @@
-package org.soumen.home.presentation.screens
+package org.soumen.watchlist.presentation
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -15,11 +15,11 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -41,66 +41,82 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.soumen.home.domain.dataModels.Data
-import org.soumen.home.presentation.states.GainerDataState
+import org.soumen.home.presentation.screens.HomeItems
 import org.soumen.home.presentation.viewmodels.HomeViewModel
 import org.soumen.shared.domain.Resources
+import org.soumen.shared.presentation.bottomBar.BottomBar
+import org.soumen.watchlist.presentation.states.WatchListDataState
+import org.soumen.watchlist.presentation.viewmodel.WatchlistViewModel
 
 @Composable
-fun GainerScreen(
+fun WatchListItemsScreen(
     modifier: Modifier = Modifier,
+    watchListId: Long,
+    watchlistViewModel: WatchlistViewModel,
     homeViewModel: HomeViewModel,
     onBackClick : () -> Unit = {},
-    onItemClick : (Data) -> Unit = {}
+    onItemClick : (Data) -> Unit = {},
 ) {
-
-    BackHandler(true) {
-        onBackClick()
-    }
-    val gainerDataState = homeViewModel.gainerListState.collectAsStateWithLifecycle()
+    val watchlistDataState = watchlistViewModel.watchListDataState.collectAsStateWithLifecycle()
     val imageDataState = homeViewModel.tickerImages.collectAsStateWithLifecycle()
-
     DisposableEffect(Unit) {
-        homeViewModel.getAllGainers()
+        watchlistViewModel.getAllItemsInWatchlist(watchListId)
         onDispose {
 
         }
     }
 
-    val gridState = rememberLazyGridState()
+    val context = LocalContext.current
 
+    BackHandler(true) {
+        onBackClick()
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            Row(modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .statusBarsPadding()
-                .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
-            ){
-                IconButton(
-                    onClick = {
-                        onBackClick()
-                    }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .statusBarsPadding(),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                    contentDescription = "BAck",
-                    tint = Resources.Colors.textColor
-                )
+                    IconButton(
+                        onClick = {
+                            onBackClick()
+                        }
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(24.dp),
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Resources.Colors.textColor
+                        )
                     }
 
-                Text(
-                    text = "Top Gainers",
-                    fontFamily = Resources.AppFont.dmSans,
-                    fontSize = 20.sp,
-                    color = Resources.Colors.textColor,
-                    fontWeight = FontWeight.Medium
-                )
+                    Text(
+                        text = "Watchlist",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = Resources.AppFont.dmSans,
+                        color = Resources.Colors.textColor
+                    )
+
+
+                }
+
+
             }
         }
     ) { innerPadding ->
+
+
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -108,42 +124,41 @@ fun GainerScreen(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .padding(horizontal = 16.dp)
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                AnimatedContent(targetState = gainerDataState.value) { state ->
-                    when (state) {
-                        is GainerDataState.Error -> {
-                            Toast.makeText(
-                                LocalContext.current,
-                                state.e,
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
 
-                        GainerDataState.Loading -> {
+            AnimatedContent(targetState = watchlistDataState.value){state->
+                Column(
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .padding(horizontal = 16.dp)
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    when(state){
+                        WatchListDataState.Empty -> {
+                            Text(text = "No items in this watchlist. Add some!" , color = Resources.Colors.textColor)
+                        }
+                        WatchListDataState.Error -> {
+                            Text(text = "Something went wrong. Please try again." , color = Resources.Colors.textColor)
+                            Toast.makeText(context , "Something went wrong. Please try again." , Toast.LENGTH_LONG).show()
+                        }
+                        WatchListDataState.Loading -> {
                             LinearProgressIndicator(
                                 modifier = Modifier.fillMaxWidth(),
                                 color = Resources.Colors.ascentGreen,
                                 trackColor = Resources.Colors.overlayColor
                             )
                         }
-
-                        is GainerDataState.Success -> {
+                        is WatchListDataState.Success -> {
+                            val data = state.data
                             LazyVerticalGrid(
-                                state = gridState,
                                 columns = GridCells.Fixed(2),
                                 horizontalArrangement = Arrangement.spacedBy(12.dp), // space between columns
                                 verticalArrangement = Arrangement.spacedBy(12.dp),   // space between rows
                                 contentPadding = PaddingValues(12.dp)               // padding around the grid
                             ) {
 
-                                items(state.data, key = { it -> it.ticker }) { item ->
+                                items(data, key = { it -> it.ticker }) { item ->
                                     HomeItems(
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -170,16 +185,17 @@ fun GainerScreen(
                                         data = item
                                     )
                                 }
+
                             }
                         }
                     }
 
+
                 }
-
             }
-
         }
 
     }
+
 
 }

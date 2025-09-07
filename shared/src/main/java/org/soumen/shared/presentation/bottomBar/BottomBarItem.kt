@@ -1,11 +1,10 @@
-package org.soumen.home.presentation.bottomBar
+package org.soumen.shared.presentation.bottomBar
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.NavigationBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import org.soumen.shared.domain.Resources
@@ -49,7 +48,7 @@ fun BottomBar(
                 label = item.label,
                 selected = selected,
                 onClick = { onBottomBarClick(item.route) },
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.Companion.weight(1f)
             )
         }
     }

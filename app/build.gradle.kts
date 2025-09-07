@@ -64,6 +64,7 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":home"))
     implementation(project(":shared"))
+    implementation(project(":watchlist"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

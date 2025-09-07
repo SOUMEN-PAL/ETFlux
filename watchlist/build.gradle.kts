@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "org.soumen.shared"
+    namespace = "org.soumen.watchlist"
     compileSdk = 36
 
     defaultConfig {
@@ -42,9 +42,13 @@ android {
 dependencies {
 
     implementation(project(":core"))
+    implementation(project(":shared"))
+    implementation(project(":home"))
 
+    implementation(libs.vico.compose.m3)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.compose.animation)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
