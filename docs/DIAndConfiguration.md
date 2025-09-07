@@ -32,3 +32,16 @@ val watchlistModule = module {
 ## Configuration/BuildConfig
 - Use Gradle properties and BuildConfig fields as needed per module.
 - Avoid hardcoding secrets; prefer local.properties or environment variables.
+
+### Local properties (example)
+Define the following in local.properties for local development:
+
+```
+apikey=Q1888W3LTE7H3P5N
+baseApi=www.alphavantage.co/query
+baseImageApi=api.api-ninjas.com/v1/logo
+imageApiKey=8NGwfRX4yrde9RLammaw5w==dGmi306WIkg7raA2
+clearbitApiKey=pk_cW4oyjgyR0Sj0WIxpBfKfA
+```
+
+Then, read them in Gradle or at runtime via BuildConfig or a configuration provider.

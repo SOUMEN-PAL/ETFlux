@@ -200,6 +200,17 @@ This document lists each Gradle module and its responsibilities.
 
 [Source: docs/BuildAndRun.md]
 
+### Environment/Secrets (local setup)
+Add the following entries to your local.properties (do not commit this file):
+
+```
+apikey=Q1888W3LTE7H3P5N
+baseApi=www.alphavantage.co/query
+baseImageApi=api.api-ninjas.com/v1/logo
+imageApiKey=8NGwfRX4yrde9RLammaw5w==dGmi306WIkg7raA2
+clearbitApiKey=pk_cW4oyjgyR0Sj0WIxpBfKfA
+```
+
 # Build and Run
 
 ## Prerequisites

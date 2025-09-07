@@ -29,3 +29,16 @@ If flavors are defined (e.g., development/release), select them in Build Variant
 ## Environment/Secrets
 - API keys or endpoints should be configured in `core` or `shared` configs (e.g., ApiConfigs). Avoid committing secrets.
 - Use local.properties or Gradle properties for local overrides.
+
+### Local setup (add to local.properties)
+Add these lines to your local.properties to run the project locally:
+
+```
+apikey=Q1888W3LTE7H3P5N
+baseApi=www.alphavantage.co/query
+baseImageApi=api.api-ninjas.com/v1/logo
+imageApiKey=8NGwfRX4yrde9RLammaw5w==dGmi306WIkg7raA2
+clearbitApiKey=pk_cW4oyjgyR0Sj0WIxpBfKfA
+```
+
+Do not commit local.properties to version control.

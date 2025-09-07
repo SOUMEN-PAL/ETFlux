@@ -152,7 +152,7 @@ See DataAndPersistence.md for more details.
 
 ---
 
-## 3. Modules
+## 2. Modules
 
 [Source: docs/Modules.md]
 
@@ -192,9 +192,22 @@ This document lists each Gradle module and its responsibilities.
 
 ---
 
-## 4. Build and Run
+## 3. Build and Run
 
 [Source: docs/BuildAndRun.md]
+
+### Environment/Secrets (local setup)
+Add the following entries to your local.properties (do not commit this file):
+
+```
+apikey=Q1888W3LTE7H3P5N
+baseApi=www.alphavantage.co/query
+baseImageApi=api.api-ninjas.com/v1/logo
+imageApiKey=8NGwfRX4yrde9RLammaw5w==dGmi306WIkg7raA2
+clearbitApiKey=pk_cW4oyjgyR0Sj0WIxpBfKfA
+```
+
+Note: local.properties is machine-specific and should not be committed. Ensure gradle sync picks up these properties via your module Gradle files or BuildConfig usage.
 
 # Build and Run
 
@@ -230,7 +243,7 @@ If flavors are defined (e.g., development/release), select them in Build Variant
 
 ---
 
-## 5. Navigation
+## 4. Navigation
 
 [Source: docs/Navigation.md]
 
@@ -271,7 +284,7 @@ class IndividualWatchlistScreenRoute(val watchlistID: Long)
 
 ---
 
-## 6. Data and Persistence
+## 5. Data and Persistence
 
 [Source: docs/DataAndPersistence.md]
 
@@ -309,7 +322,7 @@ This project uses Room for local data persistence and Retrofit/HTTP clients for 
 
 ---
 
-## 7. DI and Configuration
+## 6. DI and Configuration
 
 [Source: docs/DIAndConfiguration.md]
 
@@ -350,7 +363,7 @@ val watchlistModule = module {
 
 ---
 
-## 8. Code Style and Conventions
+## 7. Code Style and Conventions
 
 [Source: docs/CodeStyleAndConventions.md]
 
@@ -385,7 +398,7 @@ val watchlistModule = module {
 
 ---
 
-## 9. Contributing
+## 8. Contributing
 
 [Source: docs/Contributing.md]
 
@@ -412,7 +425,7 @@ Thanks for considering contributing to ETFlux!
 
 ---
 
-## 10. Troubleshooting
+## 9. Troubleshooting
 
 [Source: docs/Troubleshooting.md]
 
@@ -440,7 +453,7 @@ Thanks for considering contributing to ETFlux!
 
 ---
 
-## 11. FAQ
+## 10. FAQ
 
 [Source: docs/FAQ.md]
 
