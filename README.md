@@ -3,23 +3,19 @@
 This file aggregates all Markdown documents in a single place for easy consumption.
 
 Table of Contents
-- 1. README
-- 2. Architecture
-- 3. Modules
-- 4. Build and Run
-- 5. Navigation
-- 6. Data and Persistence
-- 7. DI and Configuration
-- 8. Code Style and Conventions
-- 9. Contributing
-- 10. Troubleshooting
-- 11. FAQ
+- 1. Architecture
+- 2. Modules
+- 3. Build and Run
+- 4. Navigation
+- 5. Data and Persistence
+- 6. DI and Configuration
+- 7. Code Style and Conventions
+- 8. Contributing
+- 9. Troubleshooting
+- 10. FAQ
 
 ---
 
-## 1. README
-
-[Source: /README.md]
 
 # ETFlux
 
@@ -84,7 +80,7 @@ Add your license information here.
 
 ---
 
-## 2. Architecture
+## 1. Architecture
 
 [Source: docs/Architecture.md]
 
