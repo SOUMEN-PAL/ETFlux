@@ -22,4 +22,8 @@ val coreModule = module {
     single { get<AppDataBase>().tickerInfoDao() }
 
     single { get<AppDataBase>().monthlyStockEntityDao() }
+
+    single { get<AppDataBase>().watchlistEntityDao() }
+
+    single { get<AppDataBase>().bookmarkEntityDao() }
 }

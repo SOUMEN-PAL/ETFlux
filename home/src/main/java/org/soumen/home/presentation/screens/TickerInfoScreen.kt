@@ -1,8 +1,11 @@
 package org.soumen.home.presentation.screens
 
+import android.widget.Button
+import android.widget.CheckBox
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,14 +18,30 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.outlined.Bookmark
+import androidx.compose.material.icons.outlined.BookmarkAdd
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -31,6 +50,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -45,6 +65,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
+import kotlinx.coroutines.launch
+import org.soumen.core.utils.setStatusBarLightIcons
+import org.soumen.home.domain.dataModels.Data
+import org.soumen.home.domain.dataModels.WatchListData
 import org.soumen.home.presentation.AmountTab
 import org.soumen.home.presentation.states.TickerDataState
 import org.soumen.home.presentation.states.TickerMonthlyDataState
@@ -52,10 +76,11 @@ import org.soumen.home.presentation.viewmodels.HomeViewModel
 import org.soumen.shared.domain.Resources
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TickerInfoScreen(
     modifier: Modifier = Modifier,
-    ticker: String,
+    ticker: Data,
     viewModel: HomeViewModel,
     onBackClick: () -> Unit = {}
 ) {
@@ -77,10 +102,20 @@ fun TickerInfoScreen(
         mutableStateOf(false)
     }
 
-    DisposableEffect(Unit) {
-        viewModel.getTickerInfo(ticker)
-        viewModel.getTickerImage(ticker)
+    val isBookmarked by viewModel.isBookmarked(ticker.ticker).collectAsState()
 
+    var showBookMarkModal by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+    val scope = rememberCoroutineScope()
+
+    val modalSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    DisposableEffect(Unit) {
+        viewModel.getTickerInfo(ticker.ticker)
+        viewModel.getTickerImage(ticker.ticker)
+        setStatusBarLightIcons(true)
         onDispose { }
     }
 
@@ -128,13 +163,22 @@ fun TickerInfoScreen(
 
                 IconButton(
                     onClick = {
-
+                        if (isBookmarked) {
+                            // Already bookmarked → remove directly
+                            viewModel.removeBookMark(ticker.ticker)
+                        } else {
+                            // Not bookmarked → open modal
+                            showBookMarkModal = true
+                            scope.launch {
+                                modalSheetState.show()
+                            }
+                        }
                     }
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.Bookmark,
+                        imageVector = if(isBookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkAdd,
                         contentDescription = "Bookmark",
-                        tint = Color.Magenta
+                        tint = if(isBookmarked) Resources.Colors.ascentGreen else Resources.Colors.textColor
                     )
 
                 }
@@ -182,7 +226,7 @@ fun TickerInfoScreen(
                             is TickerDataState.Success -> {
                                 LaunchedEffect(limit) {
                                     hasLoadedMonthly.value = true
-                                    viewModel.getMonthlyData(ticker, limit)
+                                    viewModel.getMonthlyData(ticker.ticker, limit)
                                 }
                                 val data = state.data
                                 Row(
@@ -191,7 +235,7 @@ fun TickerInfoScreen(
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
 
-                                    val image = tickerImage.value[ticker]
+                                    val image = tickerImage.value[ticker.ticker]
 
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
@@ -390,7 +434,190 @@ fun TickerInfoScreen(
 
         }
     }
+
+    var watchListName by rememberSaveable { mutableStateOf("") }
+    val watchlist by viewModel.getAllWatchlist().collectAsStateWithLifecycle()
+    if(showBookMarkModal){
+        ModalBottomSheet(
+            sheetState = modalSheetState,
+            onDismissRequest = {
+                scope.launch {
+                    modalSheetState.hide()
+                    showBookMarkModal = false
+                }
+            },
+            containerColor = Resources.Colors.background
+        ) {
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .weight(7f)
+                        .padding(16.dp),
+                    value = watchListName,
+                    onValueChange = {
+                        watchListName = it
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Resources.Colors.ascentGreen,
+                        focusedTextColor = Resources.Colors.textColor,
+                        unfocusedTextColor = Resources.Colors.textColor,
+                    ),
+                    placeholder = {
+                        Text(
+                            text = "New Watchlist Name",
+                            color = Resources.Colors.textColor,
+                            fontFamily = Resources.AppFont.dmSans
+                        )
+                    }
+                )
+
+                Button(
+                    modifier = Modifier
+                        .weight(3f)
+                        .padding(end = 16.dp),
+                    onClick = {
+                        if(watchListName.isNotEmpty()) {
+                            viewModel.addWatchList(watchListName)
+                        }
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Resources.Colors.ascentGreen
+                    )
+                ) {
+
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        Text(
+                            text = "Add",
+                            fontSize = 16.sp,
+                            color = Color.White
+                        )
+
+                        Icon(
+                            imageVector = Icons.Outlined.BookmarkAdd,
+                            contentDescription = "Add",
+                            tint = Color.White
+                        )
+                    }
+
+                }
+
+            }
+
+            var selectedId by rememberSaveable { mutableStateOf<Long?>(null) }
+            val context = LocalContext.current
+            LazyColumn(
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                items(watchlist , key = {it-> it.watchlistId}){item->
+
+
+                    WatchlistItem(
+                        watchlistData = item,
+                        isChecked = selectedId == item.watchlistId,
+                        onCheckedChange = {
+                            selectedId = if (selectedId == item.watchlistId) null else item.watchlistId
+                        },
+                        onSaveClick = { id ->
+                            viewModel.saveToBookmark(watchlistID = id , ticker = ticker)
+                            scope.launch {
+                                modalSheetState.hide()
+                            }
+                            Toast.makeText(context, "Saved to ${item.watchlistName}", Toast.LENGTH_SHORT).show()
+                        }
+                    )
+
+
+
+                }
+            }
+        }
+    }
+
 }
+
+
+@Composable
+fun WatchlistItem(
+    watchlistData : WatchListData,
+    isChecked: Boolean,
+    onCheckedChange: () -> Unit,
+    onSaveClick: (Long) -> Unit = { _ -> }
+){
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp , vertical = 4.dp),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ){
+
+
+        Row(
+            modifier = Modifier
+                .weight(7f),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Checkbox(
+                checked = isChecked,
+                onCheckedChange = {
+                    onCheckedChange()
+                }
+            )
+
+            Text(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp),
+                text = watchlistData.watchlistName,
+                fontFamily = Resources.AppFont.dmSans,
+                color = Resources.Colors.textColor,
+                fontSize = 18.sp,
+            )
+        }
+
+
+        Row(
+            modifier = Modifier
+                .weight(3f),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            AnimatedVisibility(isChecked) {
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Resources.Colors.ascentGreen
+                    ),
+                    onClick = {
+                        onSaveClick(watchlistData.watchlistId)
+                    }
+                ) {
+                    Text(
+                        text = "Save",
+                        fontSize = 16.sp,
+                        fontFamily = Resources.AppFont.dmSans,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+        }
+    }
+}
+
+
 
 @Composable
 fun HighLowLabel() {
@@ -442,7 +669,5 @@ fun HighLowLabel() {
             )
 
         }
-
-
     }
 }

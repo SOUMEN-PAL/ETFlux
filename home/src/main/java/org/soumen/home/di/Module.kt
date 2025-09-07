@@ -17,7 +17,9 @@ val HomeModule = module {
             gainersLosersEntityDao = get(),
             tickerInfoApiService = get(),
             tickerEntityDao = get(),
-            monthlyStockEntityDao = get()
+            monthlyStockEntityDao = get(),
+            watchListEntityDao = get(),
+            bookmarkEntityDao = get(),
         )
     }
 

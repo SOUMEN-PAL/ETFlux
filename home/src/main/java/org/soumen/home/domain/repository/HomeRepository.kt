@@ -3,19 +3,26 @@ package org.soumen.home.domain.repository
 import android.util.Log
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import org.soumen.core.db.dao.BookmarkEntityDao
 import org.soumen.core.db.dao.GainersLosersEntityDao
 import org.soumen.core.db.dao.MonthlyStockEntityDao
 import org.soumen.core.db.dao.TickerEntityDao
+import org.soumen.core.db.dao.WatchlistEntityDao
+import org.soumen.core.db.entities.BookmarkEntity
 import org.soumen.core.db.entities.GainersEntity
 import org.soumen.core.db.entities.LosersEntity
 import org.soumen.core.db.entities.MonthlyStockEntity
 import org.soumen.core.db.entities.TickerInfoEntity
+import org.soumen.core.db.entities.WatchlistEntity
 import org.soumen.home.data.networking.api.HomeScreenApiService
 import org.soumen.home.domain.dataModels.Data
 import org.soumen.home.domain.dataModels.HomeData
 import org.soumen.home.domain.dataModels.MonthlyTimeSeriesData
 import org.soumen.home.domain.dataModels.TickerData
+import org.soumen.home.domain.dataModels.WatchListData
 import org.soumen.shared.data.network.TickerInfoApiService
 import kotlin.String
 
@@ -25,7 +32,9 @@ class HomeRepository(
     private val tickerInfoApiService: TickerInfoApiService,
     private val gainersLosersEntityDao: GainersLosersEntityDao,
     private val tickerEntityDao: TickerEntityDao,
-    private val monthlyStockEntityDao: MonthlyStockEntityDao
+    private val monthlyStockEntityDao: MonthlyStockEntityDao,
+    private val watchListEntityDao: WatchlistEntityDao,
+    private val bookmarkEntityDao: BookmarkEntityDao
 ) {
 
     suspend fun getTopGainersAdnLosers(): Result<HomeData> {
@@ -282,6 +291,48 @@ class HomeRepository(
         }
     }
 
+    fun isBookmarked(ticker : String) : Flow<Boolean> =
+        bookmarkEntityDao.isBookmarkedFlow(ticker = ticker).map { count-> count>0 }
 
+    fun getWatchlist(): Flow<List<WatchListData>> =
+        watchListEntityDao.getAllWatchlist()
+            .map { list ->
+                list.map { entity ->
+                    WatchListData(
+                        watchlistId = entity.watchlistId,
+                        watchlistName = entity.watchlistName
+                    )
+                }
+            }
+
+    suspend fun addWatchlist(
+        watchlistName : String
+    ){
+        watchListEntityDao.upsertWatchlist(
+            WatchlistEntity(
+                watchlistName = watchlistName
+            )
+        )
+    }
+
+    suspend fun saveToBookmark(watchlistID: Long , ticker : Data) {
+
+        bookmarkEntityDao.insertBookmark(
+            BookmarkEntity(
+                ticker = ticker.ticker,
+                changeAmount = ticker.changeAmount,
+                changePercentage = ticker.changePercentage,
+                price = ticker.price,
+                volume = ticker.volume,
+                watchlistId = watchlistID
+            )
+        )
+
+
+    }
+
+    suspend fun removeBookmark(ticker: String) {
+        bookmarkEntityDao.deleteFormBookmark(ticker = ticker)
+    }
 }
 

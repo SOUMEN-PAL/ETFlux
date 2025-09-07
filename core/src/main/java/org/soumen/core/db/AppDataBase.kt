@@ -6,15 +6,19 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import kotlinx.coroutines.InternalCoroutinesApi
+import org.soumen.core.db.dao.BookmarkEntityDao
 import org.soumen.core.db.dao.GainersLosersEntityDao
 import org.soumen.core.db.dao.ImageEntityDao
 import org.soumen.core.db.dao.MonthlyStockEntityDao
 import org.soumen.core.db.dao.TickerEntityDao
+import org.soumen.core.db.dao.WatchlistEntityDao
+import org.soumen.core.db.entities.BookmarkEntity
 import org.soumen.core.db.entities.GainersEntity
 import org.soumen.core.db.entities.ImageDataEntity
 import org.soumen.core.db.entities.LosersEntity
 import org.soumen.core.db.entities.MonthlyStockEntity
 import org.soumen.core.db.entities.TickerInfoEntity
+import org.soumen.core.db.entities.WatchlistEntity
 
 /**
  * The Room database for this app.
@@ -26,8 +30,8 @@ import org.soumen.core.db.entities.TickerInfoEntity
  * The database version is currently 1.
  */
 @Database(
-    entities = [ImageDataEntity::class , GainersEntity::class , LosersEntity::class , TickerInfoEntity::class , MonthlyStockEntity::class],
-    version = 4
+    entities = [ImageDataEntity::class , GainersEntity::class , LosersEntity::class , TickerInfoEntity::class , MonthlyStockEntity::class , WatchlistEntity::class , BookmarkEntity::class],
+    version = 5
 )
 abstract class AppDataBase : RoomDatabase() {
     abstract fun imageDao() : ImageEntityDao
@@ -38,7 +42,9 @@ abstract class AppDataBase : RoomDatabase() {
 
     abstract fun monthlyStockEntityDao() : MonthlyStockEntityDao
 
+    abstract fun watchlistEntityDao() : WatchlistEntityDao
 
+    abstract fun bookmarkEntityDao() : BookmarkEntityDao
     companion object{
         @Volatile
         private var INSTANCE: AppDataBase? = null

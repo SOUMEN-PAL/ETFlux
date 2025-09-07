@@ -3,14 +3,22 @@ package org.soumen.home.presentation.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.Data
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.soumen.core.db.entities.WatchlistEntity
 import org.soumen.home.domain.dataModels.TickerData
+import org.soumen.home.domain.dataModels.WatchListData
 import org.soumen.home.domain.repository.HomeRepository
 import org.soumen.home.presentation.states.GainerDataState
 import org.soumen.home.presentation.states.HomeScreenDataState
@@ -164,6 +172,52 @@ class HomeViewModel(
                 _ticketMonthlyData.value = TickerMonthlyDataState.Error(it.message ?: "Unknown Error")
             }
 
+        }
+    }
+
+    fun isBookmarked(ticker: String): StateFlow<Boolean> {
+        return repository.isBookmarked(ticker)
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = false
+            )
+    }
+
+    fun getAllWatchlist(): StateFlow<List<WatchListData>> {
+        return repository.getWatchlist()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = emptyList()
+            )
+
+    }
+
+
+    fun addWatchList(
+        watchListName : String
+    ){
+        viewModelScope.launch (
+            Dispatchers.IO
+        ){
+            repository.addWatchlist(
+                watchlistName = watchListName
+            )
+        }
+
+    }
+
+
+    fun saveToBookmark(watchlistID :Long  , ticker : org.soumen.home.domain.dataModels.Data) {
+        viewModelScope.launch {
+            repository.saveToBookmark(watchlistID , ticker)
+        }
+    }
+
+    fun removeBookMark(ticker: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.removeBookmark(ticker)
         }
     }
 

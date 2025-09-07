@@ -14,6 +14,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import org.soumen.home.domain.dataModels.Data
 import org.soumen.home.presentation.bottomBar.BottomBarItem
 import org.soumen.home.presentation.screens.AllLosersScreen
 import org.soumen.home.presentation.screens.GainerScreen
@@ -29,7 +31,7 @@ object AllGainersScreenRoute
 object AllLosersScreenRoute
 
 @Serializable
-data class TickerInfoRoute(val ticker : String)
+data class TickerInfoRoute(val tickerJson: String)
 
 @Composable
 fun Navigation(
@@ -69,7 +71,8 @@ fun Navigation(
 
                 },
                 onItemClick = {
-                    navController.navigate(TickerInfoRoute(it))
+                    val route = TickerInfoRoute(Json.encodeToString(it))
+                    navController.navigate(route)
                 },
                 onGainersViewAllClick = {
                     navController.navigate(AllGainersScreenRoute)
@@ -100,7 +103,7 @@ fun Navigation(
                     }
                 },
                 onItemClick = {
-                    navController.navigate(TickerInfoRoute(it))
+//                    navController.navigate(TickerInfoRoute(it))
                 }
             )
 
@@ -126,7 +129,8 @@ fun Navigation(
                     navController.popBackStack()
                 },
                 onItemClick = {
-                    navController.navigate(TickerInfoRoute(it))
+                    val route = TickerInfoRoute(Json.encodeToString(it))
+                    navController.navigate(route)
                 }
             )
         }
@@ -152,7 +156,8 @@ fun Navigation(
                     navController.popBackStack()
                 },
                 onItemClick = {
-                    navController.navigate(TickerInfoRoute(it))
+                    val route = TickerInfoRoute(Json.encodeToString(it))
+                    navController.navigate(route)
                 }
             )
         }
@@ -161,10 +166,13 @@ fun Navigation(
             enterTransition = { fadeIn(animationSpec = tween(100)) },
             exitTransition = { fadeOut(animationSpec = tween(200)) }
         ) {
+            val json = it.toRoute<TickerInfoRoute>().tickerJson
+            val data = Json.decodeFromString<Data>(json)
+
             TickerInfoScreen(
                 modifier = Modifier,
                 viewModel = homeViewModel,
-                ticker = it.toRoute<TickerInfoRoute>().ticker,
+                ticker = data,
                 onBackClick = {
                     navController.popBackStack()
                 }

@@ -40,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.soumen.home.domain.dataModels.Data
 import org.soumen.home.presentation.bottomBar.BottomBar
 import org.soumen.home.presentation.states.GainerDataState
 import org.soumen.home.presentation.topBars.HomeTopBar
@@ -51,7 +52,7 @@ fun GainerScreen(
     modifier: Modifier = Modifier,
     homeViewModel: HomeViewModel,
     onBackClick : () -> Unit = {},
-    onItemClick : (String) -> Unit = {}
+    onItemClick : (Data) -> Unit = {}
 ) {
 
     BackHandler(true) {
@@ -158,7 +159,7 @@ fun GainerScreen(
                                             .clickable(
                                                 enabled = true,
                                                 onClick = {
-                                                    onItemClick(item.ticker)
+                                                    onItemClick(item)
                                                 },
                                                 indication = ripple(
                                                     color = Resources.Colors.ascentGreen,

@@ -67,7 +67,7 @@ fun HomeScreen(
     onBottomBarClick: (String) -> Unit = {},
     currentRoute: String?,
     onSearchClick: () -> Unit = {},
-    onItemClick: (String) -> Unit = { _ -> },
+    onItemClick: (Data) -> Unit = { _ -> },
     onGainersViewAllClick: () -> Unit = {},
     onLosersViewAllClick: () -> Unit = {}
 
@@ -204,7 +204,7 @@ fun HomeScreen(
                                             .clickable(
                                                 enabled = true,
                                                 onClick = {
-                                                    onItemClick(item.ticker)
+                                                    onItemClick(item)
                                                 },
                                                 indication = ripple(
                                                     color = Resources.Colors.ascentGreen,
@@ -280,7 +280,7 @@ fun HomeScreen(
                                             .clickable(
                                                 enabled = true,
                                                 onClick = {
-                                                    onItemClick(item.ticker)
+                                                    onItemClick(item)
                                                 },
                                                 indication = ripple(
                                                     color = Resources.Colors.ascentGreen,
