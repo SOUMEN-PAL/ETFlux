@@ -71,7 +71,9 @@ fun Navigation(
                 currentRoute = currentRoute,
                 onBottomBarClick = { route ->
                     navController.navigate(route) {
-
+                        popUpTo(0){
+                            inclusive = true
+                        }
                     }
                 },
                 onSearchClick = {
@@ -103,14 +105,16 @@ fun Navigation(
             WatchlistScreen(
                 watchlistViewModel = watchListViewModel,
                 onBackClick = {
-                    navController.popBackStack()
+                    navController.navigate(BottomBarItem.Home.route) {
+                        popUpTo(0) {
+                            inclusive = true
+                        }
+                    }
                 },
                 bottomBarItems = bottomBar,
                 modifier = Modifier,
                 onBottomBarClick = { route ->
-                    navController.navigate(route) {
-
-                    }
+                    navController.navigate(route)
                 },
                 currentRoute = currentRoute,
                 onItemClick = {
